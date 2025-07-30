@@ -1,0 +1,167 @@
+{
+  "user": {
+    "name": "Aisha Noor",
+    "email": "aisha.noor@example.com",
+    "password": "$2b$10$hashedpasswordexample123456",
+    "role": "volunteer",
+    "phone": "+92-312-4567890",
+    "address": "House 123, Street 4, Lahore, Pakistan",
+    "createdAt": "2024-03-01T10:30:00Z",
+    "updatedAt": "2025-07-20T15:45:00Z"
+  },
+  "userEvents": [
+    {
+      "title": "Ramadan Food Drive",
+      "description": "Distribute food packs to underprivileged families during Ramadan.",
+      "date": "2025-03-28T09:00:00Z",
+      "day": "Friday",
+      "time": "9:00 AM - 1:00 PM",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg0i5ClQLFDhg4UHZ0ZxbItAD4rSmeRmeriQ&s",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        },
+        {
+          "name": "Ahmed Raza",
+          "email": "ahmed.raza@example.com",
+          "phone": "+92-321-9876543"
+        }
+      ]
+    },
+    {
+      "title": "Eid Gift Distribution",
+      "description": "Distribute Eid gifts and clothes to orphan children.",
+      "date": "2025-04-20T14:00:00Z",
+      "day": "Sunday",
+      "time": "2:00 PM - 5:00 PM",
+      "image": "https://example.com/images/eid-gifts.jpg",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        }
+      ]
+    }
+  ],
+  "userPrograms": [
+    {
+      "title": "Literacy for All",
+      "description": "6-week program to teach basic literacy skills to women in rural areas.",
+      "startingDate": "2025-05-01T08:00:00Z",
+      "endingDate": "2025-06-12T10:00:00Z",
+      "day": "Monday",
+      "time": "8:00 AM - 10:00 AM",
+      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQg0i5ClQLFDhg4UHZ0ZxbItAD4rSmeRmeriQ&s",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        },
+        {
+          "name": "Sana Khan",
+          "email": "sana.khan@example.com",
+          "phone": "+92-333-6543210"
+        }
+      ]
+    },
+    {
+      "title": "Literacy for All",
+      "description": "6-week program to teach basic literacy skills to women in rural areas.",
+      "startingDate": "2025-05-01T08:00:00Z",
+      "endingDate": "2025-06-12T10:00:00Z",
+      "day": "Monday",
+      "time": "8:00 AM - 10:00 AM",
+      "image": "https://women-empowerment-rust.vercel.app/assets/logo2-BRQc0wwj.png",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        },
+        {
+          "name": "Sana Khan",
+          "email": "sana.khan@example.com",
+          "phone": "+92-333-6543210"
+        }
+      ]
+    },
+    {
+      "title": "Literacy for All",
+      "description": "6-week program to teach basic literacy skills to women in rural areas.",
+      "startingDate": "2025-05-01T08:00:00Z",
+      "endingDate": "2025-06-12T10:00:00Z",
+      "day": "Monday",
+      "time": "8:00 AM - 10:00 AM",
+      "image": "https://example.com/images/literacy-program.jpg",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        },
+        {
+          "name": "Sana Khan",
+          "email": "sana.khan@example.com",
+          "phone": "+92-333-6543210"
+        }
+      ]
+    },
+    {
+      "title": "Literacy for All",
+      "description": "6-week program to teach basic literacy skills to women in rural areas.",
+      "startingDate": "2025-05-01T08:00:00Z",
+      "endingDate": "2025-06-12T10:00:00Z",
+      "day": "Monday",
+      "time": "8:00 AM - 10:00 AM",
+      "image": "https://example.com/images/literacy-program.jpg",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        },
+        {
+          "name": "Sana Khan",
+          "email": "sana.khan@example.com",
+          "phone": "+92-333-6543210"
+        }
+      ]
+    },
+    {
+      "title": "Youth Leadership Bootcamp",
+      "description": "A weekend program to train future social impact leaders.",
+      "startingDate": "2025-07-12T10:00:00Z",
+      "endingDate": "2025-07-14T17:00:00Z",
+      "day": "Saturday",
+      "time": "10:00 AM - 5:00 PM",
+      "image": "https://example.com/images/leadership-camp.jpg",
+      "participants": [
+        {
+          "name": "Aisha Noor",
+          "email": "aisha.noor@example.com",
+          "phone": "+92-312-4567890"
+        }
+      ]
+    }
+  ],
+  "donations": [
+    {
+      "amount": 5000,
+      "date": "2025-01-15T13:00:00Z",
+      "method": "Bank Transfer",
+      "campaign": "Winter Blanket Drive",
+      "receiptUrl": "https://example.com/receipts/donation123.pdf"
+    },
+    {
+      "amount": 2500,
+      "date": "2025-04-10T18:00:00Z",
+      "method": "Credit Card",
+      "campaign": "Eid Gifts for Orphans",
+      "receiptUrl": "https://example.com/receipts/donation456.pdf"
+    }
+  ]
+}
