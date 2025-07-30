@@ -36,6 +36,8 @@ export interface Donation {
   amount: number;
   date: string;
   method: string;
+ receiptUrl: string;
+ approved: boolean;
 }
 
 export interface UserData {
@@ -65,4 +67,4 @@ export interface ApiCallOptions {
   requiresAuth?: boolean;
 }
 
-export type TabType = 'dashboard' | 'profile' | 'events' | 'programs' | 'donations';
+export type TabType = 'dashboard' | 'profile' | 'courses' |'events' | 'programs' | 'donations';

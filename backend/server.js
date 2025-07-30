@@ -11,6 +11,7 @@ import successStoryRoute from './routes/successStoryRoute.js'; // Importing succ
 import contactUsRoute from './routes/contactUsRoute.js';
 import galleryRoute from './routes/galleryRoute.js';
 import podcastRoute from './routes/podcastRoute.js';
+import donationRoute from "./routes/donationRoute.js"
 import path from 'path';
 
 
@@ -29,6 +30,7 @@ app.use(express.json()); // Parse incoming JSON requests
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static('uploads'));
+app.use('/api/uploads', express.static('uploads'));
 
 // Routes
 
@@ -38,9 +40,10 @@ app.use('/api/blogs', blogRoute);
 app.use('/api/teams', teamRoute);
 app.use('/api/programs', programRoute);
 app.use('/api/successstories', successStoryRoute);
-app.use('/api/contactus', contactUsRoute);
+app.use('/api/contactus', contactUsRoute);  
 app.use('/api/gallery', galleryRoute);
 app.use('/api/podcasts', podcastRoute);
+app.use('/api/donations' , donationRoute)
 
 
 // Set the PORT from environment variables or default to 8000

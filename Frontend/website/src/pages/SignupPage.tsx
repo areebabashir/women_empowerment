@@ -15,9 +15,8 @@ const SignUpPage = () => {
     password: "",
     role: "member",
     phone: "",
-    address: "",
-    company: "",
-    ngo: "",
+    address: ""
+
   });
   const [image, setImage] = useState(null);
   const [documents, setDocuments] = useState([]);
@@ -167,16 +166,16 @@ const SignUpPage = () => {
     }
 
     // Company validation (required for company role)
-    if (formData.role === 'company' && !formData.company.trim()) {
-      newErrors.company = "Company name is required";
-      isValid = false;
-    }
+    // if (formData.role === 'company' && !formData.company.trim()) {
+    //   newErrors.company = "Company name is required";
+    //   isValid = false;
+    // }
 
-    // NGO validation (required for NGO role)
-    if (formData.role === 'ngo' && !formData.ngo.trim()) {
-      newErrors.ngo = "NGO name is required";
-      isValid = false;
-    }
+    // // NGO validation (required for NGO role)
+    // if (formData.role === 'ngo' && !formData.ngo.trim()) {
+    //   newErrors.ngo = "NGO name is required";
+    //   isValid = false;
+    // }
 
     // Documents validation (required for NGO role)
     if (formData.role === 'ngo' && documents.length === 0) {
@@ -205,8 +204,8 @@ const SignUpPage = () => {
       formDataToSend.append("role", formData.role);
       formDataToSend.append("phone", formData.phone);
       formDataToSend.append("address", formData.address);
-      formDataToSend.append("company", formData.company);
-      formDataToSend.append("ngo", formData.ngo);
+      // formDataToSend.append("company", formData.company);
+      // formDataToSend.append("ngo", formData.ngo);
       
       if (image) {
         formDataToSend.append("image", image);
@@ -216,6 +215,8 @@ const SignUpPage = () => {
       documents.forEach((doc, index) => {
         formDataToSend.append("documents", doc);
       });
+
+      console.log(formDataToSend)
 
       const response = await apiCall({
         url: `${API_BASE_URL}/users/register`,
@@ -274,7 +275,7 @@ const SignUpPage = () => {
               <Input 
                 type="text" 
                 name="name"
-                placeholder="Full Name *" 
+                placeholder=" Name *" 
                 value={formData.name} 
                 onChange={handleChange}
                 disabled={loading} 
@@ -348,7 +349,6 @@ const SignUpPage = () => {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-soft-purple"
             >
               <option value="member">As a Member</option>
-              <option value="volunteer">As a Volunteer</option>
               <option value="donor">As a Donor</option>
               <option value="trainee">As a Trainee</option>
               <option value="company">As a Company</option>
@@ -356,7 +356,7 @@ const SignUpPage = () => {
             </select>
 
             {/* Company field - shown only when company role is selected */}
-            {formData.role === 'company' && (
+            {/* {formData.role === 'company' && (
               <div>
                 <Input 
                   type="text" 
@@ -368,10 +368,10 @@ const SignUpPage = () => {
                 />
                 {errors.company && <p className="mt-1 text-sm text-red-600">{errors.company}</p>}
               </div>
-            )}
+            )} */}
 
             {/* NGO field - shown only when NGO role is selected */}
-            {formData.role === 'ngo' && (
+            {/* {formData.role === 'ngo' && (
               <div>
                 <Input 
                   type="text" 
@@ -383,7 +383,7 @@ const SignUpPage = () => {
                 />
                 {errors.ngo && <p className="mt-1 text-sm text-red-600">{errors.ngo}</p>}
               </div>
-            )}
+            )} */}
 
             {/* Document upload - shown only when NGO role is selected */}
             {formData.role === 'ngo' && (

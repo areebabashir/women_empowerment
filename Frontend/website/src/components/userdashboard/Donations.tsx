@@ -1,13 +1,17 @@
 import React from "react";
 import { Calendar, DollarSign, Download, ArrowRight, Heart } from "lucide-react";
-import { Donation } from "../../types";
-
+import { User, Donation } from "../../types";
+import { useNavigate } from "react-router-dom";
 interface DonationsProps {
+  user: User;
   donations: Donation[];
   onViewAll?: () => void;
 }
 
 const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
+
+  const navigate = useNavigate()
+  donations = donations.filter((donation) => donation.approved === true);
   const totalDonated = donations.reduce((sum, donation) => sum + donation.amount, 0);
 
   // Empty state component
@@ -45,13 +49,13 @@ const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
         <>
           <div className="space-y-4">
             {donations.map((donation, index) => (
-              <div 
-                key={index} 
+              <div
+                key={index}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 transition-transform duration-300 hover:scale-[1.02] hover:shadow-lg group relative"
               >
                 {/* Gradient border effect on hover */}
                 <div className="absolute inset-0 z-0 rounded-xl opacity-0 group-hover:opacity-100 transition duration-300 bg-gradient-to-r from-green-200 via-emerald-200 to-teal-200"></div>
-                
+
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between">
                   <div className="flex-1">
                     <h3 className="text-xl font-semibold text-[#7F264B] mb-2">{donation.campaign}</h3>
@@ -72,10 +76,14 @@ const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
                     </div>
                   </div>
                   <div className="mt-4 md:mt-0">
-                    <button className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium">
+                    <a
+                      href={`${import.meta.env.VITE_API_URL}\\${donation.receiptUrl}`}
+                      download
+                      className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium"
+                    >
                       <Download className="w-4 h-4 mr-2" />
                       Receipt
-                    </button>
+                    </a>
                   </div>
                 </div>
               </div>
@@ -86,10 +94,10 @@ const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
           {donations.length > 0 && (
             <div className="flex justify-center pt-6">
               <button
-                onClick={onViewAll}
+                onClick={()=> {navigate("/donate")}}
                 className="group flex items-center px-8 py-3 bg-gradient-to-r from-[#7F264B] to-purple-600 text-white rounded-lg hover:from-[#6B1F3A] hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
               >
-                <span className="mr-2 font-semibold">VIEW ALL DONATIONS</span>
+                <span className="mr-2 font-semibold">Donate Now </span>
                 <ArrowRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" />
               </button>
             </div>
