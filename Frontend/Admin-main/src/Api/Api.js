@@ -15,11 +15,8 @@ export function SetAuthToken(getauthToken) {
 } */
 //retrieve the token from local storage to use it as component
 export function AuthToken() {
-  /* const authToken = localStorage.getItem('authToken'); */
-  const authToken = sessionStorage.getItem('authToken');
-  /* const authToken = authToken; */
-  return authToken ;
-  
+  const authToken = localStorage.getItem('authToken');
+  return authToken;
 }
 export  function AdminName(){
   const AdminName = sessionStorage.getItem('AdminName');

@@ -19,6 +19,7 @@ import {
   faBookOpen
 } from "@fortawesome/free-solid-svg-icons";
 import AdminLayout from "../../layouts/AdminLayout";
+import { AuthToken } from '../../Api/Api';
 
 const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -48,7 +49,9 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8000/api/programs/delete/${programId}`);
+        await axios.delete(`http://localhost:8000/api/programs/delete/${programId}`, {
+          headers: { 'Authorization': `Bearer ${AuthToken()}` }
+        });
 
         const updatedPrograms = programsData.filter(program => program.id !== programId);
         setProgramsData(updatedPrograms);
@@ -65,7 +68,9 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
     setParticipantsLoading(true);
     setSelectedProgram(programId);
     try {
-      const response = await axios.get(`http://localhost:8000/api/programs/${programId}/participants`);
+      const response = await axios.get(`http://localhost:8000/api/programs/${programId}/participants`, {
+        headers: { 'Authorization': `Bearer ${AuthToken()}` }
+      });
       setParticipants(response.data.participants || []);
     } catch (error) {
       setParticipants([]);
@@ -77,7 +82,9 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
     setShowViewModal(true);
     setViewLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8000/api/programs/getprogram/${programId}`);
+      const response = await axios.get(`http://localhost:8000/api/programs/getprogram/${programId}`, {
+        headers: { 'Authorization': `Bearer ${AuthToken()}` }
+      });
       setViewProgram(response.data.program || response.data);
     } catch (error) {
       setViewProgram(null);
@@ -91,7 +98,8 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
     setDeletingId(participantId);
     try {
       await axios.delete(`http://localhost:8000/api/programs/${selectedProgram}/deleteparticipants`, {
-        data: { participantId }
+        data: { participantId },
+        headers: { 'Authorization': `Bearer ${AuthToken()}` }
       });
       setParticipants(prev => prev.filter(p => p._id !== participantId && p.id !== participantId));
     } catch (error) {
@@ -136,7 +144,10 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
             />
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
               <h3 className="text-white font-semibold text-lg truncate">{program.name}</h3>
-                <p className="text-white/80 text-sm">{program.category }</p>
+              <p className="text-white/80 text-sm">{program.category}</p>
+              {program.companyName && (
+                <p className="text-white/60 text-xs mt-1">By: {program.companyName}</p>
+              )}
             </div>
           </div>
 
@@ -346,7 +357,19 @@ const Programs = () => {
         setLoading(true);
         setError(null);
 
-        const response = await axios.get('http://localhost:8000/api/programs/getallprogram');
+        // Debug: Check if token exists
+        const token = AuthToken();
+        console.log('AuthToken value:', token);
+        console.log('Token type:', typeof token);
+        console.log('Token length:', token ? token.length : 0);
+
+        if (!token) {
+          throw new Error('No authentication token found. Please log in again.');
+        }
+
+        const response = await axios.get('http://localhost:8000/api/programs/admin/getallprograms', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         
         if (!response.data || !response.data.programs) {
           throw new Error('No programs data received');
@@ -357,6 +380,7 @@ const Programs = () => {
           name: program.title,
           description: program.description,
           category: program.category,
+          companyName: program.companyId ? program.companyId.name : 'Admin Created',
           image: program.image
             ? `http://localhost:8000/uploads/${program.image}`
             : '/default-program-image.jpg',
@@ -454,6 +478,10 @@ const Programs = () => {
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       case "name-desc":
         return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      case "company-asc":
+        return sorted.sort((a, b) => (a.companyName || '').localeCompare(b.companyName || ''));
+      case "company-desc":
+        return sorted.sort((a, b) => (b.companyName || '').localeCompare(a.companyName || ''));
       default:
         return sorted;
     }
@@ -463,8 +491,8 @@ const Programs = () => {
     program.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     program.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     program.category?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    program.location?.toLowerCase().includes(searchQuery.toLowerCase())
-
+    program.location?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    program.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const sortedAndFilteredPrograms = sortPrograms(filteredPrograms);
@@ -519,6 +547,8 @@ const Programs = () => {
               <option value="oldest">Oldest First</option>
               <option value="name-asc">Name (A-Z)</option>
               <option value="name-desc">Name (Z-A)</option>
+              <option value="company-asc">Company (A-Z)</option>
+              <option value="company-desc">Company (Z-A)</option>
             </select>
           </div>
         </div>

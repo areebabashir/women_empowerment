@@ -31,6 +31,11 @@ const programSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false // Optional for admin-created programs
+  },
   participants: [
     {
       type: mongoose.Schema.Types.ObjectId,

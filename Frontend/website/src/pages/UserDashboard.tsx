@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import Sidebar from "../components/userdashboard/Sidebar";
 import Dashboard from "../components/userdashboard/Dashboard";
+import CompanyDashboard from "../components/userdashboard/CompanyDashboard";
+import CompanyPrograms from "../components/userdashboard/CompanyPrograms";
 import Profile from "../components/userdashboard/Profile";
 import Events from "../components/userdashboard/Events";
 import Programs from "../components/userdashboard/Programs";
@@ -146,6 +148,21 @@ const UserDashboard: React.FC = () => {
       return <p className="text-red-600 text-center py-6">{error}</p>;
     }
 
+    // Company-specific rendering
+    if (user?.role === 'company') {
+      switch (activeTab) {
+        case 'dashboard':
+          return <CompanyDashboard user={user} />;
+        case 'profile':
+          return user ? <Profile user={user} /> : <p>No user data available</p>;
+        case 'courses':
+          return <CompanyPrograms user={user} />;
+        default:
+          return <CompanyDashboard user={user} />;
+      }
+    }
+
+    // Regular user rendering
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;

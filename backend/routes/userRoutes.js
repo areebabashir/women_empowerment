@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   registerUser, loginUser, getProfile,
-  getAllUsers, deleteUser, updateUserRole,
+  getAllUsers, getAllCompanies, deleteUser, updateUserRole,
   getUserEvents, getUserPrograms, updateUser,
   getAllParticipationStats
 } from '../controllers/userController.js';
@@ -50,6 +50,7 @@ router.get('/profile', protect, addUserIdToBody, getProfile);
 
 // Admin routes
 router.get('/getalluser', protect, isAdmin, getAllUsers);
+router.get('/getallcompanies', protect, isAdmin, getAllCompanies);
 router.delete('/delete/:id', protect, isAdmin, deleteUser);
 router.put('/update/:id/role', protect, isAdmin, updateUserRole);
 router.get('/participation-stats', protect, isAdmin, getAllParticipationStats);

@@ -126,7 +126,9 @@ export const loginUser = async (req, res) => {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    // Use environment variable or fallback secret
+    const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
+    const token = jwt.sign({ _id: user._id, role: user.role }, jwtSecret, { expiresIn: '1d' });
     res.json({ msg: 'Login successful', token, role: user.role });
   } catch {
     res.status(500).json({ msg: 'Server error' });
@@ -145,8 +147,53 @@ export const getProfile = async (req, res) => {
 
 // Admin: Get all users
 export const getAllUsers = async (req, res) => {
-  const users = await User.find().select('-password');
-  res.json(users);
+  try {
+    const { role } = req.query;
+    let query = {};
+    
+    // If role filter is provided, filter by role
+    if (role) {
+      query.role = role;
+    }
+    
+    const users = await User.find(query).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Get all companies for admin dashboard
+export const getAllCompanies = async (req, res) => {
+  try {
+    const companies = await User.find({ role: 'company' }).select('-password');
+    
+    // Get program count for each company
+    const companiesWithStats = await Promise.all(
+      companies.map(async (company) => {
+        const programCount = await Program.countDocuments({ companyId: company._id });
+        const participantCount = await Program.aggregate([
+          { $match: { companyId: company._id } },
+          { $unwind: '$participants' },
+          { $group: { _id: null, count: { $sum: 1 } } }
+        ]);
+        
+        return {
+          ...company.toObject(),
+          programCount,
+          participantCount: participantCount.length > 0 ? participantCount[0].count : 0
+        };
+      })
+    );
+    
+    res.status(200).json({
+      success: true,
+      companies: companiesWithStats,
+      totalCompanies: companiesWithStats.length
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, msg: 'Server error' });
+  }
 };
 
 // Admin: Delete user
