@@ -7,15 +7,20 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ['member', 'volunteer', 'donor', 'admin', 'trainee', 'company', 'ngo'],
+    enum: ['member','donor', 'admin', 'trainee', 'company', 'ngo'],
     default: 'member'
   },
   image: String,
   phone: { type: String, required: false },     
   address: { type: String, required: false },
-  company: { type: String, required: false },
-  ngo: { type: String, required: false },
-  documents: [{ type: String }], // Array of document file paths
+  donations: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Donation'
+  }
+],
+
+  documents: [{ type: String , required: false }], // Array of document file paths
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

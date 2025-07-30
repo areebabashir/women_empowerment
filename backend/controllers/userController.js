@@ -8,13 +8,13 @@ import mongoose from 'mongoose';
 // Register
 export const registerUser = async (req, res) => {
   try {
-    console.log(req)
-    const { name, email, password, role, phone, address, company, ngo } = req.body;
+    console.log(req.body)
+    const { name, email, password, role, phone, address,  } = req.body;
     
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
+      return res.status(400).json({ msg: 'User Already exists' });
     }
 
     // Hash password
@@ -28,8 +28,7 @@ export const registerUser = async (req, res) => {
       role: role || 'member',
       phone: phone || '',
       address: address || '',
-      company: company || '',
-      ngo: ngo || ''
+
     };
 
     // Add image path if file was uploaded
@@ -53,8 +52,6 @@ export const registerUser = async (req, res) => {
         email: user.email,
         role: user.role,
         image: user.image,
-        company: user.company,
-        ngo: user.ngo,
         documents: user.documents
       }
     });

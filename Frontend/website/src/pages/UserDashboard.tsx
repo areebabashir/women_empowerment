@@ -17,6 +17,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 const UserDashboard: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [userPrograms, setUserPrograms] = useState<Program[]>([]);
+  const [userDonations ,setUserDonations] = useState<Donation[]>([]);
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -31,6 +32,7 @@ const UserDashboard: React.FC = () => {
         method: 'GET',
         requiresAuth: true
       });
+    
 
       if (!profileRes.success) {
         const errorData = profileRes.data as ApiErrorResponse;
@@ -45,9 +47,24 @@ const UserDashboard: React.FC = () => {
         setError(errorData.msg || 'Failed to fetch profile');
       } else {
         setUser(profileRes.data);
+        if(profileRes.data.role === "donor") setActiveTab("donations")
         console.log("👤 User:", profileRes.data);
       }
 
+      const donationRes = await apiCall<Donation[]>({
+        url: `${API_BASE_URL}/donations/user`,
+        method: 'GET',
+        requiresAuth: true
+      });
+
+      if (donationRes.success) {
+        setUserDonations(donationRes.data.data);
+        console.log("📘 Donations:", donationRes.data);
+      } else {
+        const errorData = donationRes.data as ApiErrorResponse;
+        setError(errorData.msg || 'Failed to fetch programs');
+        console.log("")
+      }
       const programsRes = await apiCall<Program[]>({
         url: `${API_BASE_URL}/users/programs`,
         method: 'GET',
@@ -94,11 +111,18 @@ const UserDashboard: React.FC = () => {
   };
 
   useEffect(() => {
+    
     scrollTo(0,0)
     fetchData();
+
+
+
+ 
   }, []);
 
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+ 
+
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const { donations }: { donations: Donation[] } = userdata;
@@ -122,7 +146,7 @@ const UserDashboard: React.FC = () => {
 
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard events={userEvents} programs={userPrograms} donations={donations} />;
+        return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
       case 'profile':
         return user ? <Profile user={user} /> : <p>No user data available</p>;
       case 'events':
@@ -130,9 +154,9 @@ const UserDashboard: React.FC = () => {
       case 'programs':
         return <Programs programs={userPrograms} />;
       case 'donations':
-        return <Donations donations={donations} />;
+        return <Donations donations={userDonations} />;
       default:
-        return <Dashboard events={userEvents} programs={userPrograms} donations={donations} />;
+        return <Dashboard events={userEvents} programs={userPrograms} donations={userDonations} />;
     }
   };
 

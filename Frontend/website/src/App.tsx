@@ -15,6 +15,7 @@ import Events from "./pages/Events";
 import LoginPage from "./pages/LoginPage";
 import UserDasboard from "./pages/UserDashboard"
 import ProtectedRoute from "./components/ProtectedRoute";
+import DonationForm from "./pages/DonationForm"
 import TermsConditions from "./pages/terms";
 import PrivacyPolicy from "./pages/privacy";
 const queryClient = new QueryClient();
@@ -71,6 +72,8 @@ const App = () => (
               </ProtectedRoute>
             }
           />
+          <Route path="/Donate" element={<DonationForm />} />
+          
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
           <Route path="/programs" element={<Programs />} />

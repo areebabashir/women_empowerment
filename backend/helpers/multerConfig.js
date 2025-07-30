@@ -1,43 +1,49 @@
-import multer from "multer";
-import path from "path";
+import multer from 'multer';
+import path from 'path';
 
+// Define allowed extensions for images and documents
+const allowedImageTypes = /jpeg|jpg|png|gif/;
+const allowedDocTypes = /pdf|doc|docx/;
+
+// Storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    if (file.fieldname === 'image') {
+      cb(null, 'uploads/images');
+    } else if (file.fieldname === 'documents') {
+      cb(null, 'uploads/documents');
+    } else if (file.fieldname === 'receipt') {
+      // You can choose one of these folders or create 'uploads/receipts'
+      cb(null, 'uploads/receipts');
+    } else {
+      cb(new Error('Invalid fieldname'));
+    }
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
-const upload = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png|gif|mp4|avi|mov|wmv|flv|webm|pdf|doc|docx/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Only images, videos, and documents (PDF, DOC, DOCX) are allowed"));
-    }
-  }
-});
+// File filter function
+function fileFilter(req, file, cb) {
+  const extname = path.extname(file.originalname).toLowerCase().substring(1);
 
-// For multiple file uploads (documents)
-const uploadMultiple = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    const filetypes = /pdf|doc|docx/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error("Only documents (PDF, DOC, DOCX) are allowed"));
-    }
+  if (
+    (file.fieldname === 'image' && allowedImageTypes.test(extname)) ||
+    (file.fieldname === 'documents' && allowedDocTypes.test(extname)) ||
+    // Accept both image and document types for 'receipt'
+    (file.fieldname === 'receipt' && (allowedImageTypes.test(extname) || allowedDocTypes.test(extname)))
+  ) {
+    cb(null, true);
+  } else {
+    cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Invalid file type'));
   }
-}).array('documents', 10); // Allow up to 10 documents
+}
 
-export { upload as default, uploadMultiple }; 
+const upload = multer({ storage, fileFilter });
+
+// Export specific middlewares
+export const uploadReceipt = upload.single('receipt');
+export const uploadMultiple = upload.fields([{ name: 'documents', maxCount: 5 }]);
+
+export default upload;
