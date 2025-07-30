@@ -11,7 +11,6 @@ interface DonationsProps {
 const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
 
   const navigate = useNavigate()
-  donations = donations.filter((donation) => donation.approved === true);
   const totalDonated = donations.reduce((sum, donation) => sum + donation.amount, 0);
 
   // Empty state component
