@@ -50,10 +50,11 @@ const UserDashboard: React.FC = () => {
         if(profileRes.data.role === "donor") setActiveTab("donations")
         console.log("👤 User:", profileRes.data);
       }
+      if(profileRes.data.role== "donor"){
 
-      const donationRes = await apiCall<Donation[]>({
-        url: `${API_BASE_URL}/donations/user`,
-        method: 'GET',
+        const donationRes = await apiCall<Donation[]>({
+          url: `${API_BASE_URL}/donations/user`,
+          method: 'GET',
         requiresAuth: true
       });
 
@@ -65,6 +66,7 @@ const UserDashboard: React.FC = () => {
         setError(errorData.msg || 'Failed to fetch programs');
         console.log("")
       }
+    }
       const programsRes = await apiCall<Program[]>({
         url: `${API_BASE_URL}/users/programs`,
         method: 'GET',
