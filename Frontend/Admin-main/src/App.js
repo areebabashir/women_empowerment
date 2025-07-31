@@ -33,6 +33,7 @@ import EventParticipants from "./Admin/event/EventParticipants";
 import ProgramParticipants from "./Admin/program/ProgramParticipants";
 import Awareness from "./Admin/awareness/Awareness";
 
+import Donations from "./Admin/Donation/Donation.jsx";
 
 
 
@@ -56,6 +57,8 @@ function App() {
         <Route path="/Admin/Event/Update/:id" element={<ProtectedRoute><UpdateEvent /></ProtectedRoute>} />
         <Route path="/Admin/Users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
         <Route path="/Admin/Accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
+        <Route path="/Admin/Donations" element={<ProtectedRoute><Donations /></ProtectedRoute>} />
+
         <Route path="/Admin/Team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
         <Route path="/Admin/Team/Update/:id" element={<ProtectedRoute><UpdateTeam /></ProtectedRoute>} />
         <Route path="/Admin/Program" element={<ProtectedRoute><Program /></ProtectedRoute>} />

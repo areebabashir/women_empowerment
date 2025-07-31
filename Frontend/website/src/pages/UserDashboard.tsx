@@ -67,7 +67,7 @@ const UserDashboard: React.FC = () => {
           console.log("📘 Donations:", donationRes.data);
         } else {
           const errorData = donationRes.data as ApiErrorResponse;
-          setError(errorData.msg || 'Failed to fetch donations');
+          // setError(errorData.msg || 'Failed to fetch donations');
           console.log("")
         }
       }

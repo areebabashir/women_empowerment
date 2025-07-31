@@ -23,7 +23,10 @@ const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
       <p className="text-gray-500 text-center max-w-md leading-relaxed">
         You haven't made any donations yet. Your contribution can make a real difference in someone's life!
       </p>
-      <button className="mt-6 px-6 py-3 bg-gradient-to-r from-[#7F264B] to-purple-600 text-white rounded-lg hover:from-[#6B1F3A] hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+      <p className="text-gray-500 text-center max-w-md leading-relaxed">
+        Once Approved your Donations will appear here !
+      </p>
+      <button onClick={()=>{navigate("/donate")}} className="mt-6 px-6 py-3 bg-gradient-to-r from-[#7F264B] to-purple-600 text-white rounded-lg hover:from-[#6B1F3A] hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
         Make a Donation
       </button>
     </div>

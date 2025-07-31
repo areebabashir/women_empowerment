@@ -13,6 +13,7 @@ function SideBar() {
     { to: "/Admin/Program", icon: faProjectDiagram, label: "Program" },
     { to: "/Admin/SuccessStories", icon: faStar, label: "Success Stories" },
     { to: "/Admin/Gallery", icon: faImages, label: "Gallery" },
+    { to: "/Admin/Donations", icon: faImages, label: "Donation" },
     { to: "/Admin/Podcast", icon: faPodcast, label: "Podcast" },
     { to: "/Admin/Awareness", icon: faLightbulb, label: "Legal Awareness" },
     { to: "/Admin/Users", icon: faUser, label: "Users" },
