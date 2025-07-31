@@ -564,7 +564,11 @@ const partnerLogos = [
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="w-full h-48 rounded-xl bg-gradient-to-br from-primary/10 to-soft-purple/10 mb-6 overflow-hidden">
                     <img
+<<<<<<< HEAD
                       src={getImageUrl(`uploads/${story.img}`)}
+=======
+                      src={`http://localhost:8000/uploads/images/${story.img}`}
+>>>>>>> 91f6e2bdae97a1746f3b1c90bf4da9db7ab53262
                       alt={story.name}
                       className="w-full h-full object-cover"
                     />

@@ -382,7 +382,7 @@ const Programs = () => {
           category: program.category,
           companyName: program.companyId ? program.companyId.name : 'Admin Created',
           image: program.image
-            ? `http://localhost:8000/uploads/${program.image}`
+            ? `http://localhost:8000/uploads/images/${program.image}`
             : '/default-program-image.jpg',
           startDate: program.startingDate,
           endDate: program.endingDate,

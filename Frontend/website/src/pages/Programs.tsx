@@ -205,7 +205,7 @@ const Programs = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 space-y-4 overflow-y-auto max-h-[90vh]">
             <img
-              src={`http://localhost:8000/uploads/${viewMoreProgram.image}`}
+              src={`http://localhost:8000/uploads/images/${viewMoreProgram.image}`}
               alt={viewMoreProgram.title}
               className="w-full h-64 object-cover rounded-md mb-4"
             />

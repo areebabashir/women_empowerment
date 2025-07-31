@@ -35,7 +35,7 @@ function UpdatePostForm() {
           description: response.data.blog.description,
           image: null,
           imageUrl: response.data.blog.image
-          ? `http://localhost:8000/uploads/${response.data.blog.image}`
+          ? `http://localhost:8000/uploads/images/${response.data.blog.image}`
             : '/default-post-image.jpg',
           publicationDate: response.data.blog.publicationDate ? response.data.blog.publicationDate.slice(0, 10) : '',
           author: response.data.blog.author,

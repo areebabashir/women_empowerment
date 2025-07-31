@@ -58,7 +58,7 @@ const Events: React.FC<EventsProps> = ({ events, onViewAll }) => {
                   {/* Image Section */}
                   <div className="md:w-1/4 lg:w-1/5">
                     <img
-                      src={`http://localhost:8000/uploads${event.image}`}
+                      src={`http://localhost:8000/uploads/images/${event.image}`}
                       alt={event.title}
                       className="w-full h-48 md:h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
