@@ -36,7 +36,7 @@ const Events = () => {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    scrollTo(0,0)
+    scrollTo(0, 0);
     async function fetchEvents() {
       try {
         const data = await getAllEvents();
@@ -102,7 +102,7 @@ const Events = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-20 lg:pt-24 pb-16 bg-gradient-to-br from-section-soft to-gentle-rose mt-14 ">
+      <section className="pt-20 lg:pt-24 pb-16 bg-gradient-to-br from-section-soft to-gentle-rose mt-14">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl lg:text-6xl font-bold text-primary mb-6">
             Explore Our Events
@@ -111,15 +111,13 @@ const Events = () => {
             Discover opportunities to engage and empower in your community.
           </p>
           <div className="max-w-md mx-auto flex gap-2 mt-8">
-            <div className="container mx-auto px-4 mb-2">
-              <Input
-                type="text"
-                placeholder="Search events by title..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="max-w-xl mx-auto"
-              />
-            </div>
+            <Input
+              type="text"
+              placeholder="Search events by title..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="max-w-xl mx-auto"
+            />
             <Button onClick={() => {}}>Search</Button>
           </div>
         </div>
@@ -162,16 +160,22 @@ const Events = () => {
                   <CardContent>
                     <CardDescription className="mb-4 line-clamp-3">
                       {event.description?.slice(0, 100)}...
-                      <span
-                        onClick={() => setViewMoreEvent(event)}
-                        className="text-primary cursor-pointer ml-1"
-                      >
-                        View more
-                      </span>
                     </CardDescription>
-                    <Button className="w-full" onClick={() => handleparticipate(event._id)}>
-                      Participate
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="w-1/2 text-primary border-primary hover:bg-primary/10 transition"
+                        onClick={() => setViewMoreEvent(event)}
+                      >
+                        View More
+                      </Button>
+                      <Button
+                        className="w-1/2"
+                        onClick={() => handleparticipate(event._id)}
+                      >
+                        Participate
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
@@ -183,7 +187,7 @@ const Events = () => {
       {/* Image Overlay */}
       {selectedEvent?.showOverlay && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="max-w-4xl w-full relative">
+          <div className="max-w-4xl w-full relative animate-fadeInSlide">
             <img
               src={`http://localhost:8000/uploads/${selectedEvent.image}`}
               alt={selectedEvent.title}
@@ -203,7 +207,7 @@ const Events = () => {
       {/* View More Popup */}
       {viewMoreEvent && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 space-y-4 overflow-y-auto max-h-[90vh]">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6 space-y-4 overflow-y-auto max-h-[90vh] animate-fadeInSlide">
             <img
               src={`http://localhost:8000/uploads/${viewMoreEvent.image}`}
               alt={viewMoreEvent.title}
@@ -218,7 +222,7 @@ const Events = () => {
             </p>
             <Button
               variant="ghost"
-              className="text-sm text-muted-foreground bg-pink-100"
+              className="text-sm text-muted-foreground bg-pink-100 hover:bg-pink-200 transition"
               onClick={() => setViewMoreEvent(null)}
             >
               Close
@@ -230,7 +234,7 @@ const Events = () => {
       {/* Register Popup */}
       {selectedEvent && !selectedEvent.showOverlay && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 space-y-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full p-6 space-y-4 animate-fadeInSlide">
             <h3 className="text-xl font-bold text-primary mb-2">
               Register for {selectedEvent.title}
             </h3>
@@ -241,7 +245,7 @@ const Events = () => {
             <Button className="w-full">Participate</Button>
             <Button
               variant="ghost"
-              className="w-full text-sm text-muted-foreground"
+              className="w-full text-sm text-muted-foreground hover:bg-gray-100"
               onClick={() => setSelectedEvent(null)}
             >
               Cancel
