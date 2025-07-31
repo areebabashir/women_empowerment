@@ -752,134 +752,38 @@ const partnerLogos = [
         </div>
       )}
 
-      {/* Legal Awareness Modal */}
-      {showLegalModal && activeLegalInfo && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
-          <div className="bg-white max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            
-            {/* Header */}
-            <div className={`bg-gradient-to-r ${activeLegalInfo.color} p-6 text-white relative`}>
-              <button
-                onClick={() => {
-                  setShowLegalModal(false);
-                  toast.success("Legal Resource Closed - Modal closed.");
-                }}
-                className="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl"
-              >
-                ✕
-              </button>
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
-                  {activeLegalInfo.icon}
-                </div>
-                <div>
-                  <h3 className="text-3xl font-bold mb-2">{activeLegalInfo.title}</h3>
-                  <p className="text-xl opacity-90">{activeLegalInfo.name}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Content */}
-            <div className="p-8">
-              {/* Emergency Contact Section */}
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-                <h4 className="text-xl font-bold text-red-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-6 h-6" />
-                  Emergency Contacts
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Main Hotline</p>
-                      <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Emergency</p>
-                      <p className="font-mono text-lg text-red-700">{activeLegalInfo.emergency}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-3">
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => handleEmergencyCall(activeLegalInfo.phone, activeLegalInfo.title)}
-                  >
-                    <Phone className="w-4 h-4 mr-2" />
-                    Call Hotline Now
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-50"
-                    onClick={() => handleEmergencyCall('911', 'Emergency Services')}
-                  >
-                    <PhoneCall className="w-4 h-4 mr-2" />
-                    Call 911
-                  </Button>
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="mb-8">
-                <h4 className="text-2xl font-bold text-gray-800 mb-4">About This Service</h4>
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  {activeLegalInfo.description}
-                </p>
-              </div>
-
-              {/* Services */}
-              <div className="mb-8">
-                <h4 className="text-2xl font-bold text-gray-800 mb-6">Services Available</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {activeLegalInfo.services.map((service, index) => (
-                    <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                      <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
-                      <p className="text-gray-700 leading-relaxed">{service}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Important Notice */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h4 className="text-xl font-bold text-blue-800 mb-3 flex items-center gap-2">
-                  <Shield className="w-6 h-6" />
-                  Important Information
-                </h4>
-                <ul className="space-y-2 text-blue-700">
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    All services are completely confidential and free of charge
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    Available 24/7 - you can call anytime, day or night
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    Trained professionals will listen without judgment
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    You don't have to give your real name or any identifying information
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-blue-500 mt-1">•</span>
-                    They can help connect you with local resources in your area
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
+{/* Our Partners - Infinite Logo Slider */}
+<section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        Our Trusted Partners
+      </h2>
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Collaborating with leading organizations to empower women worldwide
+      </p>
+    </div>
 
+    <div className="relative overflow-hidden py-6">
+      <div className="flex w-max animate-scroll-slow items-center">
+        {/* Double the array for seamless looping */}
+        {[...partnerLogos, ...partnerLogos].map((logo, index) => (
+          <div 
+            key={`${logo.name}-${index}`} 
+            className="px-8 flex items-center justify-center"
+            style={{ minWidth: '200px' }}
+          >
+            <div className="grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100">
+              {logo.component}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
       <Footer />
     </div>
   );
