@@ -21,7 +21,7 @@ router.post('/add',uploadReceipt, addUserIdToBody,  createDonation);
 router.get('/all',authenticateAdmin, isAdmin, getAllDonations);
 
 // 👤 Get own donations
-router.get('/user', authenticateAdmin, getUserDonations);
+router.get('/user', addUserIdToBody, getUserDonations);
 
 // 🔍 Get donation by ID
 router.get('/unapproved',authenticateAdmin, isAdmin, getUnapprovedDonations); // Only admin can view

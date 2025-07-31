@@ -55,7 +55,8 @@ const UserDashboard: React.FC = () => {
       }
       
       // Fetch donations for donors and members
-      if(profileRes.data.role === "donor" || profileRes.data.role === "member"){
+      if(profileRes.data.role === "donor" || profileRes.data.role === "member" || profileRes.data.role === "member" ){
+        console.log("fetching donations")
         const donationRes = await apiCall<Donation[]>({
           url: `${API_BASE_URL}/donations/user`,
           method: 'GET',
@@ -63,8 +64,9 @@ const UserDashboard: React.FC = () => {
         });
 
         if (donationRes.success) {
-          setUserDonations(donationRes.data.data);
           console.log("📘 Donations:", donationRes.data);
+          console.log(donationRes.data)
+          setUserDonations(donationRes.data.data);
         } else {
           const errorData = donationRes.data as ApiErrorResponse;
           // setError(errorData.msg || 'Failed to fetch donations');
@@ -132,7 +134,7 @@ const UserDashboard: React.FC = () => {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
-  const { donations }: { donations: Donation[] } = userdata;
+  // const { donations }: { donations: Donation[] } = userdata;
 
   const toggleSidebar = (): void => setIsSidebarOpen(!isSidebarOpen);
   const closeSidebar = (): void => setIsSidebarOpen(false);
