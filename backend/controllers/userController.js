@@ -8,7 +8,11 @@ import mongoose from 'mongoose';
 // Register
 export const registerUser = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log('=== Registration Request Debug ===');
+    console.log('req.body:', req.body);
+    console.log('req.files:', req.files);
+    console.log('req.file:', req.file);
+    
     const { name, email, password, role, phone, address,  } = req.body;
     
     // Check if user already exists
@@ -28,18 +32,23 @@ export const registerUser = async (req, res) => {
       role: role || 'member',
       phone: phone || '',
       address: address || '',
-
     };
 
-    // Add image path if file was uploaded
-    if (req.file) {
-      userData.image = req.file.path; // or req.file.filename if you prefer just the filename
+    console.log('User data before files:', userData);
+
+    // Add image path if file was uploaded (only if multer was used)
+    if (req.files && req.files['image'] && req.files['image'][0]) {
+      userData.image = `uploads/images/${req.files['image'][0].filename}`;
+      console.log('Image added:', userData.image);
     }
 
-    // Add documents if files were uploaded (for NGO role)
-    if (req.files && req.files.length > 0) {
-      userData.documents = req.files.map(file => file.path);
+    // Add documents if files were uploaded (for NGO role) - only if multer was used
+    if (req.files && req.files['documents'] && req.files['documents'].length > 0) {
+      userData.documents = req.files['documents'].map(file => `uploads/documents/${file.filename}`);
+      console.log('Documents added:', userData.documents);
     }
+
+    console.log('Final user data:', userData);
 
     // Create user
     user = await User.create(userData);
@@ -58,7 +67,8 @@ export const registerUser = async (req, res) => {
     
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ msg: 'Server error' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ msg: 'Server error', error: error.message });
   }
 };
 
@@ -77,8 +87,13 @@ export const updateUser = async (req, res) => {
     if (role) updatedData.role = role;
     
     // If image is uploaded
-    if (req.file) {
-      updatedData.image = req.file.path; // or req.file.filename if preferred
+    if (req.files && req.files['image'] && req.files['image'][0]) {
+      updatedData.image = `uploads/images/${req.files['image'][0].filename}`;
+    }
+
+    // If documents are uploaded (for NGO users)
+    if (req.files && req.files['documents'] && req.files['documents'].length > 0) {
+      updatedData.documents = req.files['documents'].map(file => `uploads/documents/${file.filename}`);
     }
 
     // Update user in database
@@ -98,6 +113,7 @@ export const updateUser = async (req, res) => {
         phone: user.phone,
         address: user.address,
         image: user.image,
+        documents: user.documents,
         createdAt : user.createdAt
       }
     });
@@ -122,14 +138,35 @@ export const loginUser = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-
       return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    // Check approval status for companies and NGOs
+    if ((user.role === 'company' || user.role === 'ngo') && !user.isApproved) {
+      if (user.approvalStatus === 'pending') {
+        return res.status(403).json({ 
+          msg: 'Your account is pending approval. Please wait for admin approval.',
+          approvalStatus: 'pending'
+        });
+      } else if (user.approvalStatus === 'rejected') {
+        return res.status(403).json({ 
+          msg: `Your account has been rejected. Reason: ${user.rejectionReason || 'No reason provided'}`,
+          approvalStatus: 'rejected',
+          rejectionReason: user.rejectionReason
+        });
+      }
     }
 
     // Use environment variable or fallback secret
     const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
     const token = jwt.sign({ _id: user._id, role: user.role }, jwtSecret, { expiresIn: '1d' });
-    res.json({ msg: 'Login successful', token, role: user.role });
+    res.json({ 
+      msg: 'Login successful', 
+      token, 
+      role: user.role,
+      isApproved: user.isApproved,
+      approvalStatus: user.approvalStatus
+    });
   } catch {
     res.status(500).json({ msg: 'Server error' });
   }
@@ -318,6 +355,122 @@ export const getAllParticipationStats = async (req, res) => {
   } catch (error) {
     console.error('Participation stats error:', error);
     res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// Get pending approvals (companies and NGOs)
+export const getPendingApprovals = async (req, res) => {
+  try {
+    const pendingUsers = await User.find({
+      role: { $in: ['company', 'ngo'] },
+      approvalStatus: 'pending'
+    }).select('-password');
+
+    res.json({
+      success: true,
+      data: pendingUsers
+    });
+  } catch (error) {
+    console.error('Error fetching pending approvals:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Approve user (company or NGO)
+export const approveUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const adminId = req.user._id;
+
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    if (user.role !== 'company' && user.role !== 'ngo') {
+      return res.status(400).json({ msg: 'Only companies and NGOs can be approved' });
+    }
+
+    if (user.approvalStatus !== 'pending') {
+      return res.status(400).json({ msg: 'User is not pending approval' });
+    }
+
+    // Update user approval status
+    user.isApproved = true;
+    user.approvalStatus = 'approved';
+    user.approvalDate = new Date();
+    user.approvedBy = adminId;
+    user.rejectionReason = null;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      msg: `${user.role} approved successfully`,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        approvalStatus: user.approvalStatus
+      }
+    });
+  } catch (error) {
+    console.error('Error approving user:', error);
+    res.status(500).json({ msg: 'Server error' });
+  }
+};
+
+// Reject user (company or NGO)
+export const rejectUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { rejectionReason } = req.body;
+    const adminId = req.user._id;
+
+    if (!rejectionReason) {
+      return res.status(400).json({ msg: 'Rejection reason is required' });
+    }
+
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
+
+    if (user.role !== 'company' && user.role !== 'ngo') {
+      return res.status(400).json({ msg: 'Only companies and NGOs can be rejected' });
+    }
+
+    if (user.approvalStatus !== 'pending') {
+      return res.status(400).json({ msg: 'User is not pending approval' });
+    }
+
+    // Update user approval status
+    user.isApproved = false;
+    user.approvalStatus = 'rejected';
+    user.approvalDate = new Date();
+    user.approvedBy = adminId;
+    user.rejectionReason = rejectionReason;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      msg: `${user.role} rejected successfully`,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        approvalStatus: user.approvalStatus,
+        rejectionReason: user.rejectionReason
+      }
+    });
+  } catch (error) {
+    console.error('Error rejecting user:', error);
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 

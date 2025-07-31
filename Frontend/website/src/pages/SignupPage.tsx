@@ -18,7 +18,6 @@ const SignUpPage = () => {
     address: ""
 
   });
-  const [image, setImage] = useState(null);
   const [documents, setDocuments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({
@@ -26,7 +25,6 @@ const SignUpPage = () => {
     email: "",
     password: "",
     phone: "",
-    image: "",
     documents: "",
     general: [],
   });
@@ -45,35 +43,6 @@ const SignUpPage = () => {
         ...prev,
         [name]: "",
         general: prev.general.filter(err => !err.includes(name))
-      }));
-    }
-  };
-
-  const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
-      
-      if (!validImageTypes.includes(file.type)) {
-        setErrors(prev => ({
-          ...prev,
-          image: "Image must be JPEG, PNG, or GIF"
-        }));
-        return;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({
-          ...prev,
-          image: "Image size must be less than 5MB"
-        }));
-        return;
-      }
-      
-      setImage(file);
-      setErrors(prev => ({
-        ...prev,
-        image: ""
       }));
     }
   };
@@ -124,7 +93,6 @@ const SignUpPage = () => {
       email: "",
       password: "",
       phone: "",
-      image: "",
       documents: "",
       general: []
     };
@@ -178,10 +146,11 @@ const SignUpPage = () => {
     // }
 
     // Documents validation (required for NGO role)
-    if (formData.role === 'ngo' && documents.length === 0) {
-      newErrors.documents = "Documents are required for NGO registration";
-      isValid = false;
-    }
+    // Temporarily disabled for testing
+    // if (formData.role === 'ngo' && documents.length === 0) {
+    //   newErrors.documents = "Documents are required for NGO registration";
+    //   isValid = false;
+    // }
 
     setErrors(newErrors);
     return isValid;
@@ -197,31 +166,22 @@ const SignUpPage = () => {
     }
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("email", formData.email.trim().toLowerCase());
-      formDataToSend.append("password", formData.password);
-      formDataToSend.append("role", formData.role);
-      formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("address", formData.address);
-      // formDataToSend.append("company", formData.company);
-      // formDataToSend.append("ngo", formData.ngo);
-      
-      if (image) {
-        formDataToSend.append("image", image);
-      }
-      
-      // Append documents
-      documents.forEach((doc, index) => {
-        formDataToSend.append("documents", doc);
-      });
+      // Send as JSON data instead of FormData for testing
+      const userData = {
+        name: formData.name,
+        email: formData.email.trim().toLowerCase(),
+        password: formData.password,
+        role: formData.role,
+        phone: formData.phone,
+        address: formData.address,
+      };
 
-      console.log(formDataToSend)
+      console.log('User data being sent:', userData);
 
       const response = await apiCall({
         url: `${API_BASE_URL}/users/register`,
         method: "POST",
-        data: formDataToSend,
+        data: userData,
         requiresAuth: false,
       });
 
@@ -328,18 +288,6 @@ const SignUpPage = () => {
                 onChange={handleChange}
                 disabled={loading} 
               />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Profile Image</label>
-              <input 
-                type="file" 
-                accept="image/*" 
-                onChange={handleImageChange} 
-                disabled={loading} 
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-soft-purple" 
-              />
-              {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
             </div>
 
             <select 

@@ -16,6 +16,9 @@ interface LoginResponse {
   token: string;
   role: string;
   msg: string;
+  isApproved?: boolean;
+  approvalStatus?: string;
+  rejectionReason?: string;
 }
 
 const LoginPage = () => {
@@ -63,6 +66,24 @@ const LoginPage = () => {
       });
 
       if (response.success) {
+        // Check if user needs approval (for companies and NGOs)
+        if (response.data.role === 'company' || response.data.role === 'ngo') {
+          if (!response.data.isApproved) {
+            if (response.data.approvalStatus === 'pending') {
+              setError('Your account is pending approval. Please wait for admin approval.');
+              toast.error('Account pending approval. Please wait for admin approval.');
+              return;
+            } else if (response.data.approvalStatus === 'rejected') {
+              const rejectionMsg = response.data.rejectionReason 
+                ? `Your account has been rejected. Reason: ${response.data.rejectionReason}`
+                : 'Your account has been rejected.';
+              setError(rejectionMsg);
+              toast.error('Account rejected. Please contact admin for more information.');
+              return;
+            }
+          }
+        }
+
         // Store authentication data
         localStorage.setItem('authToken', response.data.token);
         localStorage.setItem('userRole', response.data.role);

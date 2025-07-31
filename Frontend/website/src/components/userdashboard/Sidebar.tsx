@@ -50,9 +50,9 @@ const getVisibleTabsForRole = (role: string): TabType[] => {
     case 'ngo':
       return ['dashboard', 'profile', 'donations']; // only show dashboard, donations, profile
     case 'member':
-      return ['dashboard', 'profile', 'events', 'programs']; // hide courses, donations
+      return ['dashboard', 'profile', 'events', 'programs', 'donations']; // include donations for members
     case 'trainee':
-      return ['dashboard', 'profile', 'courses']; // only show dashboard, courses, profile
+      return ['dashboard', 'profile', 'events', 'programs']; // same as member: hide courses, donations
     default:
       return ['dashboard', 'profile']; // fallback
   }

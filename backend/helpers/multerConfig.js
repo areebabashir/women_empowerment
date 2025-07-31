@@ -13,25 +13,29 @@ const storage = multer.diskStorage({
     } else if (file.fieldname === 'documents') {
       cb(null, 'uploads/documents');
     } else if (file.fieldname === 'receipt') {
-      // You can choose one of these folders or create 'uploads/receipts'
       cb(null, 'uploads/receipts');
     } else {
       cb(new Error('Invalid fieldname'));
     }
   },
   filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    const filename = `${Date.now()}-${file.originalname}`;
+    cb(null, filename);
   }
 });
 
-// File filter function
+// File filter function - only apply when files are actually uploaded
 function fileFilter(req, file, cb) {
+  // If no file is provided, skip validation
+  if (!file) {
+    return cb(null, true);
+  }
+
   const extname = path.extname(file.originalname).toLowerCase().substring(1);
 
   if (
     (file.fieldname === 'image' && allowedImageTypes.test(extname)) ||
     (file.fieldname === 'documents' && allowedDocTypes.test(extname)) ||
-    // Accept both image and document types for 'receipt'
     (file.fieldname === 'receipt' && (allowedImageTypes.test(extname) || allowedDocTypes.test(extname)))
   ) {
     cb(null, true);
@@ -40,7 +44,13 @@ function fileFilter(req, file, cb) {
   }
 }
 
-const upload = multer({ storage, fileFilter });
+const upload = multer({ 
+  storage, 
+  fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
 
 // Export specific middlewares
 export const uploadReceipt = upload.single('receipt');

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Mail, Phone, MapPin, Pencil, Save, AlertCircle, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Pencil, Save, AlertCircle, CheckCircle, FileText } from "lucide-react";
 import { User, ApiErrorResponse } from "../../types";
 import { apiCall } from "@/api/apiCall";
 
@@ -14,6 +14,7 @@ interface ValidationErrors {
     phone?: string;
     address?: string;
     image?: string;
+    documents?: string;
 }
 
 interface FormData {
@@ -22,6 +23,7 @@ interface FormData {
     phone: string;
     role: string;
     image: File | null;
+    documents: File[];
 }
 
 // Move InputField component outside of Profile component
@@ -87,6 +89,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
         phone: user.phone || "",
         role: user.role || "member",
         image: null,
+        documents: [],
     });
 
     const [errors, setErrors] = useState<ValidationErrors>({});
@@ -119,91 +122,111 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
     };
 
     const validateImage = (file: File | null): string | undefined => {
-        if (!file) return undefined;
-
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        if (!allowedTypes.includes(file.type)) {
-            return "Please select a valid image file (JPEG, PNG, or GIF)";
+        if (file) {
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                return "Image must be JPEG, PNG, or GIF";
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                return "Image size must be less than 5MB";
+            }
         }
-
-        const maxSize = 5 * 1024 * 1024; // 5MB
-        if (file.size > maxSize) {
-            return "Image size must be less than 5MB";
-        }
-
         return undefined;
     };
 
-    // Validate all fields
+    const validateDocuments = (files: File[]): string | undefined => {
+        if (user.role === 'ngo' && files.length === 0) {
+            return "Documents are required for NGO users";
+        }
+        
+        for (const file of files) {
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!validTypes.includes(file.type)) {
+                return "Documents must be PDF, DOC, or DOCX format";
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                return "Each document must be less than 10MB";
+            }
+        }
+        
+        if (files.length > 10) {
+            return "Maximum 10 documents allowed";
+        }
+        
+        return undefined;
+    };
+
     const validateForm = (): ValidationErrors => {
         return {
             name: validateName(formData.name),
             phone: validatePhone(formData.phone),
             address: validateAddress(formData.address),
             image: validateImage(formData.image),
+            documents: validateDocuments(formData.documents),
         };
     };
 
-    // Handle input changes with real-time validation
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
 
-        // Clear API error when user starts typing
-        if (apiError) setApiError("");
-        if (successMessage) setSuccessMessage("");
-
-        // Real-time validation for touched fields
-        if (touched[name]) {
-            const newErrors = { ...errors };
-            switch (name) {
-                case 'name':
-                    newErrors.name = validateName(value);
-                    break;
-                case 'phone':
-                    newErrors.phone = validatePhone(value);
-                    break;
-                case 'address':
-                    newErrors.address = validateAddress(value);
-                    break;
-            }
-            setErrors(newErrors);
+        // Clear error when user starts typing
+        if (errors[name as keyof ValidationErrors]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: undefined
+            }));
         }
+
+        // Mark field as touched
+        setTouched(prev => ({ ...prev, [name]: true }));
     };
 
-    // Handle field blur (mark as touched)
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-        const { name } = e.target;
+        const { name, value } = e.target;
         setTouched(prev => ({ ...prev, [name]: true }));
 
-        // Validate on blur
-        const newErrors = { ...errors };
+        // Validate specific field
+        let fieldError: string | undefined;
         switch (name) {
             case 'name':
-                newErrors.name = validateName(formData.name);
+                fieldError = validateName(value);
                 break;
             case 'phone':
-                newErrors.phone = validatePhone(formData.phone);
+                fieldError = validatePhone(value);
                 break;
             case 'address':
-                newErrors.address = validateAddress(formData.address);
+                fieldError = validateAddress(value);
                 break;
         }
-        setErrors(newErrors);
+
+        if (fieldError !== errors[name as keyof ValidationErrors]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: fieldError
+            }));
+        }
     };
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         setFormData(prev => ({ ...prev, image: file }));
-
-        // Clear messages
-        if (apiError) setApiError("");
-        if (successMessage) setSuccessMessage("");
-
-        // Validate image
+        
         const imageError = validateImage(file);
         setErrors(prev => ({ ...prev, image: imageError }));
         setTouched(prev => ({ ...prev, image: true }));
+    };
+
+    const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        setFormData(prev => ({ ...prev, documents: files }));
+        
+        const documentError = validateDocuments(files);
+        setErrors(prev => ({ ...prev, documents: documentError }));
+        setTouched(prev => ({ ...prev, documents: true }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -218,6 +241,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
             phone: true,
             address: true,
             image: true,
+            documents: true,
         });
 
         // Validate form
@@ -234,7 +258,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
 
         const token = localStorage.getItem("authToken");
         if (!token) {
-            setApiError("Unauthorized. Please log in again.");
+            setApiError("Authentication token not found. Please log in again.");
             setLoading(false);
             return;
         }
@@ -246,6 +270,13 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
             body.append("phone", formData.phone.trim());
             body.append("role", formData.role);
             if (formData.image) body.append("image", formData.image);
+            
+            // Append documents for NGO users
+            if (user.role === 'ngo') {
+                formData.documents.forEach((doc, index) => {
+                    body.append("documents", doc);
+                });
+            }
 
             const response = await apiCall<User>({
                 url: `${API_BASE_URL}/users/profile`,
@@ -283,6 +314,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
             phone: user.phone || "",
             role: user.role || "member",
             image: null,
+            documents: [],
         });
         setErrors({});
         setTouched({});
@@ -291,218 +323,240 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
     };
 
     return (
-        <div className="space-y-6">
-            <div className="flex justify-between items-start">
-                <h1 className="text-3xl font-bold text-[#7F264B]">PROFILE</h1>
-                <div className="relative w-32 h-32 bg-gradient-to-br from-[#7F264B] to-[#e44487] rounded-full flex items-center justify-center">
-                    <img
-                        src={`http://localhost:8000/${user.image}`}
-                        alt="Profile"
-                        className="w-full h-full rounded-full object-cover"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).src = '/default-avatar.png'; // Fallback image
-                        }}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
+                {!editMode ? (
+                    <button
+                        onClick={() => setEditMode(true)}
+                        className="flex items-center space-x-2 px-4 py-2 bg-[#7F264B] text-white rounded-lg hover:bg-[#7F264B]/90 transition-colors"
+                    >
+                        <Pencil className="w-4 h-4" />
+                        <span>Edit Profile</span>
+                    </button>
+                ) : (
+                    <div className="flex space-x-3">
+                        <button
+                            onClick={handleSubmit}
+                            disabled={loading}
+                            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                        >
+                            <Save className="w-4 h-4" />
+                            <span>{loading ? "Saving..." : "Save Changes"}</span>
+                        </button>
+                        <button
+                            onClick={handleCancelEdit}
+                            disabled={loading}
+                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
+
+            {apiError && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+                    {apiError}
+                </div>
+            )}
+
+            {successMessage && (
+                <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+                    {successMessage}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <InputField
+                        label="Full Name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={errors.name}
+                        touched={touched}
+                        loading={loading}
+                        placeholder="Enter your full name"
+                    />
+
+                    <InputField
+                        label="Phone Number"
+                        name="phone"
+                        type="tel"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        error={errors.phone}
+                        touched={touched}
+                        loading={loading}
+                        placeholder="+923001234567"
                     />
                 </div>
-            </div>
 
-            {/* Success Message */}
-            {successMessage && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center">
-                    <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                    <span className="text-green-700">{successMessage}</span>
-                </div>
-            )}
+                <InputField
+                    label="Address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={errors.address}
+                    touched={touched}
+                    loading={loading}
+                    placeholder="Enter your address"
+                />
 
-            {/* API Error Message */}
-            {apiError && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center">
-                    <AlertCircle className="w-5 h-5 text-red-600 mr-2" />
-                    <span className="text-red-700">{apiError}</span>
-                </div>
-            )}
-
-            <div className="flex justify-end gap-3">
-                {editMode && (
-                    <button
-                        type="button"
-                        onClick={handleCancelEdit}
+                {/* Image Upload */}
+                <div>
+                    <label className="block text-sm font-medium text-[#7F264B] mb-1">
+                        Profile Image
+                    </label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
                         disabled={loading}
-                        className="flex items-center px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                )}
-                {!editMode && (
-                    <button
-                        type="button"
-                        onClick={() => setEditMode(true)}
-                        className="flex items-center px-6 py-2 bg-[#7F264B] text-white rounded-lg hover:bg-[#5e1d39] transition-colors"
-                    >
-                        <Pencil className="w-4 h-4 mr-2" />
-                        Edit Profile
-                    </button>
-                )}
-            </div>
+                        className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#7F264B]/20 ${
+                            errors.image ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-[#7F264B]'
+                        }`}
+                    />
+                    {errors.image && touched.image && (
+                        <p className="mt-1 text-sm text-red-600 flex items-center">
+                            <AlertCircle className="w-4 h-4 mr-1" />
+                            {errors.image}
+                        </p>
+                    )}
+                    {formData.image && (
+                        <p className="mt-1 text-sm text-green-600 flex items-center">
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Image selected: {formData.image.name}
+                        </p>
+                    )}
+                </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                {editMode ? (
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                            <InputField
-                                label="Full Name *"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={errors.name}
-                                placeholder="Enter your full name"
-                                touched={touched}
-                                loading={loading}
-                            />
-
-                            <div>
-                                <label className="block text-sm font-medium text-[#7F264B] mb-1">Role</label>
-                                <select
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                    disabled={loading}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7F264B]/20 focus:border-[#7F264B]"
-                                >
-                                    <option value="member">Member</option>
-                                    <option value="donor">Donor</option>
-                                    <option value="volunteer">Volunteer</option>
-                                    <option value="admin">Admin</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-[#7F264B] mb-1">Email</label>
-                                <div className="flex items-center p-3 bg-gray-50 border border-gray-300 rounded-lg">
-                                    <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                                    <span className="text-gray-600">{user.email} (Cannot be changed)</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-4">
-                            <InputField
-                                label="Phone Number *"
-                                name="phone"
-                                type="tel"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={errors.phone}
-                                placeholder="e.g., +923001234567 or 03001234567"
-                                touched={touched}
-                                loading={loading}
-                            />
-
-                            <InputField
-                                label="Address *"
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                                error={errors.address}
-                                placeholder="Enter your complete address"
-                                touched={touched}
-                                loading={loading}
-                            />
-
-                            <div>
-                                <label className="block text-sm font-medium text-[#7F264B] mb-1">Profile Image</label>
-                                <input
-                                    type="file"
-                                    name="image"
-                                    accept="image/*"
-                                    onChange={handleImageChange}
-                                    disabled={loading}
-                                    className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#7F264B]/20 ${errors.image ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-[#7F264B]'
-                                        }`}
-                                />
-                                {errors.image && touched.image && (
-                                    <p className="mt-1 text-sm text-red-600 flex items-center">
-                                        <AlertCircle className="w-4 h-4 mr-1" />
-                                        {errors.image}
-                                    </p>
-                                )}
-                                <p className="mt-1 text-xs text-gray-500">
-                                    Supported formats: JPEG, PNG, GIF. Max size: 5MB
+                {/* Document Upload for NGO Users */}
+                {user.role === 'ngo' && (
+                    <div>
+                        <label className="block text-sm font-medium text-[#7F264B] mb-1">
+                            NGO Documents (PDF, DOC, DOCX - Max 10 files, 10MB each)
+                        </label>
+                        <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            multiple
+                            onChange={handleDocumentChange}
+                            disabled={loading}
+                            className={`w-full p-3 border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[#7F264B]/20 ${
+                                errors.documents ? 'border-red-500 bg-red-50' : 'border-gray-300 focus:border-[#7F264B]'
+                            }`}
+                        />
+                        {errors.documents && touched.documents && (
+                            <p className="mt-1 text-sm text-red-600 flex items-center">
+                                <AlertCircle className="w-4 h-4 mr-1" />
+                                {errors.documents}
+                            </p>
+                        )}
+                        {formData.documents.length > 0 && (
+                            <div className="mt-2">
+                                <p className="text-sm text-green-600 flex items-center mb-2">
+                                    <CheckCircle className="w-4 h-4 mr-1" />
+                                    {formData.documents.length} document(s) selected:
                                 </p>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                    {formData.documents.map((doc, index) => (
+                                        <li key={index} className="flex items-center">
+                                            <FileText className="w-4 h-4 mr-2" />
+                                            {doc.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {/* Display current documents for NGO users */}
+                {user.role === 'ngo' && user.documents && user.documents.length > 0 && (
+                    <div>
+                        <label className="block text-sm font-medium text-[#7F264B] mb-1">
+                            Current Documents
+                        </label>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                            <ul className="text-sm text-gray-600 space-y-1">
+                                {user.documents.map((doc, index) => (
+                                    <li key={index} className="flex items-center">
+                                        <FileText className="w-4 h-4 mr-2" />
+                                        <a 
+                                            href={doc.startsWith('http') ? doc : `${API_BASE_URL.replace('/api', '')}/uploads/${doc}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            {doc.split('/').pop() || `Document ${index + 1}`}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                )}
+            </form>
+
+            {/* Display current profile information in view mode */}
+            {!editMode && (
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <Mail className="w-5 h-5 text-gray-500" />
+                            <div>
+                                <p className="text-sm text-gray-500">Email</p>
+                                <p className="text-gray-800 font-medium">{user.email}</p>
                             </div>
                         </div>
 
-                        <div className="md:col-span-2 flex justify-end">
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="flex items-center px-6 py-2 bg-[#7F264B] text-white rounded-lg hover:bg-[#5e1d39] transition-colors disabled:opacity-50"
-                            >
-                                {loading ? (
-                                    <>
-                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save className="w-4 h-4 mr-2" />
-                                        Save Changes
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    </form>
-                ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <Phone className="w-5 h-5 text-gray-500" />
                             <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Full Name</label>
-                                <p className="text-lg text-gray-800 mt-1">{user.name}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Role</label>
-                                <p className="text-lg text-gray-800 mt-1 capitalize">{user.role}</p>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Email</label>
-                                <div className="flex items-center mt-1">
-                                    <Mail className="w-4 h-4 text-gray-400 mr-2" />
-                                    <p className="text-lg text-gray-800">{user.email}</p>
-                                </div>
+                                <p className="text-sm text-gray-500">Phone</p>
+                                <p className="text-gray-800 font-medium">{user.phone || "Not provided"}</p>
                             </div>
                         </div>
-                        <div className="space-y-4">
+
+                        <div className="flex items-center space-x-3">
+                            <MapPin className="w-5 h-5 text-gray-500" />
                             <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Phone</label>
-                                <div className="flex items-center mt-1">
-                                    <Phone className="w-4 h-4 text-gray-400 mr-2" />
-                                    <p className="text-lg text-gray-800">{user.phone || "Not provided"}</p>
-                                </div>
+                                <p className="text-sm text-gray-500">Address</p>
+                                <p className="text-gray-800 font-medium">{user.address || "Not provided"}</p>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-5 h-5 text-gray-500">👤</div>
                             <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Address</label>
-                                <div className="flex items-center mt-1">
-                                    <MapPin className="w-4 h-4 text-gray-400 mr-2" />
-                                    <p className="text-lg text-gray-800">{user.address || "Not provided"}</p>
-                                </div>
+                                <p className="text-sm text-gray-500">Role</p>
+                                <p className="text-gray-800 font-medium capitalize">{user.role}</p>
                             </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3">
+                            <div className="w-5 h-5 text-gray-500">📅</div>
                             <div>
-                                <label className="text-sm font-medium text-[#7F264B]">Member Since</label>
-                                <p className="text-lg text-gray-800 mt-1">
-                                    {new Date(user.createdAt).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
+                                <p className="text-sm text-gray-500">Member Since</p>
+                                <p className="text-gray-800 font-medium">
+                                    {new Date(user.createdAt).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
                                     })}
                                 </p>
                             </div>
                         </div>
                     </div>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

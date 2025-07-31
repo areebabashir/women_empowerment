@@ -16,7 +16,7 @@ export const protect = (req, res, next) => {
     // Use environment variable or fallback secret
     const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
     const decoded = jwt.verify(token, jwtSecret);
-    console.log('Token decoded successfully:', { id: decoded.id, role: decoded.role });
+    console.log('Token decoded successfully:', { _id: decoded._id, role: decoded.role });
     req.user = decoded;
     next();
   } catch (error) {

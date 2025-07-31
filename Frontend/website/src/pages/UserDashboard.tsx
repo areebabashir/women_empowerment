@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import Sidebar from "../components/userdashboard/Sidebar";
 import Dashboard from "../components/userdashboard/Dashboard";
+import TraineeDashboard from "../components/userdashboard/TraineeDashboard";
 import CompanyDashboard from "../components/userdashboard/CompanyDashboard";
 import CompanyPrograms from "../components/userdashboard/CompanyPrograms";
 import Profile from "../components/userdashboard/Profile";
@@ -52,23 +53,25 @@ const UserDashboard: React.FC = () => {
         if(profileRes.data.role === "donor") setActiveTab("donations")
         console.log("👤 User:", profileRes.data);
       }
-      if(profileRes.data.role== "donor"){
-
+      
+      // Fetch donations for donors and members
+      if(profileRes.data.role === "donor" || profileRes.data.role === "member"){
         const donationRes = await apiCall<Donation[]>({
           url: `${API_BASE_URL}/donations/user`,
           method: 'GET',
-        requiresAuth: true
-      });
+          requiresAuth: true
+        });
 
-      if (donationRes.success) {
-        setUserDonations(donationRes.data.data);
-        console.log("📘 Donations:", donationRes.data);
-      } else {
-        const errorData = donationRes.data as ApiErrorResponse;
-        setError(errorData.msg || 'Failed to fetch programs');
-        console.log("")
+        if (donationRes.success) {
+          setUserDonations(donationRes.data.data);
+          console.log("📘 Donations:", donationRes.data);
+        } else {
+          const errorData = donationRes.data as ApiErrorResponse;
+          setError(errorData.msg || 'Failed to fetch donations');
+          console.log("")
+        }
       }
-    }
+
       const programsRes = await apiCall<Program[]>({
         url: `${API_BASE_URL}/users/programs`,
         method: 'GET',
@@ -159,6 +162,40 @@ const UserDashboard: React.FC = () => {
           return <CompanyPrograms user={user} />;
         default:
           return <CompanyDashboard user={user} />;
+      }
+    }
+
+    // Trainee-specific rendering
+    if (user?.role === 'trainee') {
+      switch (activeTab) {
+        case 'dashboard':
+          return <TraineeDashboard events={userEvents} programs={userPrograms} />;
+        case 'profile':
+          return user ? <Profile user={user} /> : <p>No user data available</p>;
+        case 'events':
+          return <Events events={userEvents} />;
+        case 'programs':
+          return <Programs programs={userPrograms} />;
+        default:
+          return <TraineeDashboard events={userEvents} programs={userPrograms} />;
+      }
+    }
+
+    // Member-specific rendering
+    if (user?.role === 'member') {
+      switch (activeTab) {
+        case 'dashboard':
+          return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
+        case 'profile':
+          return user ? <Profile user={user} /> : <p>No user data available</p>;
+        case 'events':
+          return <Events events={userEvents} />;
+        case 'programs':
+          return <Programs programs={userPrograms} />;
+        case 'donations':
+          return <Donations donations={userDonations} />;
+        default:
+          return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
       }
     }
 
