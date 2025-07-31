@@ -171,9 +171,61 @@ const About = () => {
           </div>
         </div>
       </section>
-      <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
+      
 
+<section className="py-20 bg-section-soft">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+        Message from the Founder
+      </h2>
+    </div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+      {/* Left: Image */}
+      <div className="flex justify-center lg:pl-7">
+        <div className="w-full max-w-sm rounded-3xl overflow-hidden shadow-xl">
+          <img
+            src="/2f.PNG"
+            alt="Romana Ch."
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
 
+      {/* Right: Message + Name + Title */}
+      <div className="space-y-6">
+        <div className="text-muted-foreground text-lg leading-relaxed space-y-6">
+          <p>
+            I started this journey from Gujrat with passion and a clear purpose—to bring positive change for women and contribute to Pakistan's social and economic development.
+          </p>
+          <p>
+            My mission is to strengthen women in meaningful ways and provide them with opportunities at every doorstep.
+          </p>
+          <p>
+            At <strong>Growing Women</strong>, we believe that women's financial growth is not just a dream—it's a shared responsibility. This organization was founded to empower women through education, entrepreneurship, and economic inclusion.
+          </p>
+          <p>
+            Now, women can pursue their dreams with direction and dignity. With your support, I am committed to knocking on every door and connecting every opportunity to ensure that no woman is left behind.
+          </p>
+          <p>
+            <strong>Growing Women Prosperity Organization</strong>, originally founded as Growing Pakistan in 2020 by Miss Romana Ch in Gujrat, began as a passionate individual initiative to empower women through financial independence and entrepreneurship. In 2025, the initiative was officially registered under the name <strong>Growing Women Prosperity Organization</strong> to reflect its focused mission of uplifting women across Pakistan.
+          </p>
+        </div>
+        <div className="flex items-center mt-6">
+          <div className="w-9 h-0.5 bg-foreground mr-4"></div>
+          <div>
+            <h3 className="text-3xl font-bold text-foreground mb-1">Romana Ch.</h3>
+            <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
+              Founder / Chairperson
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
       {/* Our Story Timeline */}
       <section className="py-20 bg-section-soft">
         <div className="container mx-auto px-4">

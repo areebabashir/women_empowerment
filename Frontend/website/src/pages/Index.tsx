@@ -532,7 +532,7 @@ const partnerLogos = [
   </div>
 )}
 
-      <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
+    
 
 {/* Our Partners - Infinite Logo Slider */}
 <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
@@ -564,6 +564,7 @@ const partnerLogos = [
     </div>
   </div>
 </section>
+  <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
       <Footer />
     </div>
   );
