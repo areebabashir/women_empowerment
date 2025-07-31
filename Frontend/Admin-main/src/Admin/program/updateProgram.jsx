@@ -35,7 +35,7 @@ function UpdateProgramForm() {
           title: program.title,
           description: program.description,
           image: null,
-          imageUrl: program.image ? `http://localhost:8000/uploads/${program.image}` : '/default-program-image.jpg',
+          imageUrl: program.image ? `http://localhost:8000/uploads/images/${program.image}` : '/default-program-image.jpg',
           startingDate: program.startingDate ? program.startingDate.slice(0, 10) : '',
           endingDate: program.endingDate ? program.endingDate.slice(0, 10) : '',
           day: program.day || '',

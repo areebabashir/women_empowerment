@@ -488,7 +488,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
                                     <li key={index} className="flex items-center">
                                         <FileText className="w-4 h-4 mr-2" />
                                         <a 
-                                            href={doc.startsWith('http') ? doc : `${API_BASE_URL.replace('/api', '')}/uploads/${doc}`}
+                                            href={doc.startsWith('http') ? doc : `${API_BASE_URL.replace('/api', '')}/${doc}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="text-blue-600 hover:underline"

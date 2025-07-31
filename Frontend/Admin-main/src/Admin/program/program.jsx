@@ -319,7 +319,7 @@ const ProgramsData = ({ programsData, currentPage, itemsPerPage, setProgramsData
               <div>
                 <h2 className="text-2xl font-bold mb-4 text-gray-800">{viewProgram.name || viewProgram.title}</h2>
                 <img
-                  src={viewProgram.image ? `http://localhost:8000/uploads/${viewProgram.image}` : '/default-program-image.jpg'}
+                  src={viewProgram.image ? `http://localhost:8000/uploads/images/${viewProgram.image}` : '/default-program-image.jpg'}
                   alt={viewProgram.name || viewProgram.title}
                   className="h-48 w-full object-cover rounded mb-4"
                   onError={e => { e.target.onerror = null; e.target.src = '/default-program-image.jpg'; }}
@@ -382,7 +382,7 @@ const Programs = () => {
           category: program.category,
           companyName: program.companyId ? program.companyId.name : 'Admin Created',
           image: program.image
-            ? `http://localhost:8000/uploads/${program.image}`
+            ? `http://localhost:8000/uploads/images/${program.image}`
             : '/default-program-image.jpg',
           startDate: program.startingDate,
           endDate: program.endingDate,

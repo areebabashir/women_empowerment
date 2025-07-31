@@ -85,7 +85,7 @@ const Gallery = () => {
                   <div className="cursor-pointer">
                     {item.images && item.images.length > 0 && (
                       <img
-                        src={`http://localhost:8000/uploads/${item.images[0]}`}
+                        src={`http://localhost:8000/uploads/images/${item.images[0]}`}
                         alt={item.title}
                         className="w-full h-64 object-cover transition-transform duration-300 hover:scale-105"
                         onClick={() => openModal(galleryIdx, 0)}
@@ -136,7 +136,7 @@ const Gallery = () => {
 
           <div className="relative w-full max-w-3xl max-h-[75vh] flex items-center justify-center bg-black rounded-lg overflow-hidden">
             <img
-              src={`http://localhost:8000/uploads/${galleryItems[selectedGalleryIndex].images[selectedImageIndex]}`}
+              src={`http://localhost:8000/uploads/images/${galleryItems[selectedGalleryIndex].images[selectedImageIndex]}`}
               alt={galleryItems[selectedGalleryIndex].title}
               className="w-full h-full object-contain"
             />

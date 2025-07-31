@@ -33,6 +33,7 @@ export const createDonation = async (req, res) => {
 };
 
 export const getAllDonations = async (req, res) => {
+   console.log("get all donations")
     const donations = await Donation.find().populate('user', 'name email');
     res.json(donations);
 };
@@ -79,4 +80,32 @@ export const approveDonation = async (req, res) => {
     if (!donation) return res.status(404).json({ msg: 'Donation not found' });
 
     res.json({ msg: 'Donation approved', donation });
+};
+
+
+export const getUnapprovedDonations = async (req, res) => {
+  try {
+    const unapprovedDonations = await Donation.find({ approved: false }).populate('user', 'name email');
+    res.status(200).json(unapprovedDonations);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch unapproved donations', error });
+  }
+};
+
+export const rejectDonation = async (req, res) => {
+  try {
+    const donation = await Donation.findById(req.params.id);
+
+    if (!donation) {
+      return res.status(404).json({ message: 'Donation not found' });
+    }
+
+    donation.rejected = true;
+    donation.approved = false; // Make sure it's not approved
+    await donation.save();
+
+    res.status(200).json({ message: 'Donation rejected successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to reject donation', error });
+  }
 };

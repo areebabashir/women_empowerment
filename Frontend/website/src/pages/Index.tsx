@@ -14,8 +14,16 @@ import {
   Star,
   ArrowRight,
   Mail,
-  Globe
+  Globe,
+  Phone,
+  AlertTriangle,
+  Scale,
+  FileText,
+  Gavel,
+  PhoneCall
 } from "lucide-react";
+import { useKeenSlider } from "keen-slider/react";
+import "keen-slider/keen-slider.min.css";
 import heroImage from "@/assets/hero-empowered-women.jpg";
 import supportImage from "@/assets/women-supporting-each-other.jpg";
 import successStoryImage from "@/assets/success-story-woman.jpg";
@@ -37,13 +45,160 @@ const Index = () => {
     programs: 25,
     countries: 8
   };
+// Keen Slider configuration for Success Stories
+  const [storySliderRef] = useKeenSlider({
+    loop: true,
+    slides: {
+      perView: 1,
+      spacing: 24,
+    },
+    defaultAnimation: {
+      duration: 1000,
+    },
+    slideChanged: (slider) => {
+      setScrollIndex(slider.track.details.rel);
+    },
+  });
 
+  // Keen Slider configuration for Legal Awareness
+  const [legalSliderRef] = useKeenSlider({
+    loop: true,
+    breakpoints: {
+      "(min-width: 768px)": {
+        slides: {
+          perView: 2,
+          spacing: 24,
+        },
+      },
+      "(min-width: 1024px)": {
+        slides: {
+          perView: 3,
+          spacing: 24,
+        },
+      },
+    },
+    slides: {
+      perView: 1,
+      spacing: 24,
+    },
+    defaultAnimation: {
+      duration: 800,
+    },
+  });
   const [successStories, setSuccessStories] = useState([]);
   const [loadingStories, setLoadingStories] = useState(true);
   const [errorStories, setErrorStories] = useState(null);
   const [scrollIndex, setScrollIndex] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [activeStory, setActiveStory] = useState(null);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [activeLegalInfo, setActiveLegalInfo] = useState(null);
+
+  // Legal Awareness Data
+  const legalAwarenessCards = [
+    {
+      id: 1,
+      title: "Domestic Violence Helpline",
+      name: "National Domestic Violence Hotline",
+      phone: "1-800-799-7233",
+      emergency: "911",
+      description: "24/7 confidential support for victims of domestic violence. Trained advocates provide crisis intervention, safety planning, and referrals to local resources.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Crisis intervention and emotional support",
+        "Safety planning assistance", 
+        "Local shelter and resource referrals",
+        "Legal advocacy information"
+      ],
+      icon: <Heart className="w-8 h-8" />,
+      color: "from-red-500 to-pink-600"
+    },
+    {
+      id: 2,
+      title: "Sexual Assault Support",
+      name: "RAINN National Sexual Assault Hotline",
+      phone: "1-800-656-4673",
+      emergency: "911",
+      description: "Free, confidential support for survivors of sexual assault. Connects you with trained staff from local sexual assault service providers.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "24/7 crisis counseling",
+        "Medical and legal advocacy",
+        "Support group referrals",
+        "Online chat support available"
+      ],
+      icon: <Shield className="w-8 h-8" />,
+      color: "from-purple-500 to-indigo-600"
+    },
+    {
+      id: 3,
+      title: "Legal Aid Services",
+      name: "Women's Law Center",
+      phone: "1-800-HELP-LAW",
+      emergency: "For emergencies call 911",
+      description: "Free legal assistance for women facing discrimination, family law issues, and workplace harassment. Know your rights and get help.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Family law and divorce assistance",
+        "Employment discrimination cases",
+        "Housing rights advocacy",
+        "Immigration law support"
+      ],
+      icon: <Scale className="w-8 h-8" />,
+      color: "from-blue-500 to-teal-600"
+    },
+    {
+      id: 4,
+      title: "Mental Health Crisis",
+      name: "Crisis Text Line",
+      phone: "Text HOME to 741741",
+      emergency: "988 - Suicide Prevention",
+      description: "Free, 24/7 mental health support via text message. Trained crisis counselors provide immediate emotional support.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Text-based crisis counseling",
+        "Suicide prevention support",
+        "Mental health resource referrals",
+        "Anonymous and confidential"
+      ],
+      icon: <Heart className="w-8 h-8" />,
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      id: 5,
+      title: "Workplace Rights",
+      name: "Equal Employment Opportunity Commission",
+      phone: "1-800-669-4000",
+      emergency: "Document incidents immediately",
+      description: "Report workplace discrimination, harassment, and violations of your employment rights. Free consultation and investigation services.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Sexual harassment reporting",
+        "Wage discrimination claims",
+        "Pregnancy discrimination support",
+        "Workplace accommodation requests"
+      ],
+      icon: <Building className="w-8 h-8" />,
+      color: "from-orange-500 to-red-600"
+    },
+    {
+      id: 6,
+      title: "Housing Assistance",
+      name: "National Housing Law Project",
+      phone: "1-800-HOUSING",
+      emergency: "Contact local police for illegal evictions",
+      description: "Legal assistance for housing discrimination, tenant rights, and preventing homelessness. Protecting your right to safe housing.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Tenant rights education",
+        "Housing discrimination cases",
+        "Eviction prevention assistance",
+        "Accessible housing advocacy"
+      ],
+      icon: <MapPin className="w-8 h-8" />,
+      color: "from-indigo-500 to-purple-600"
+    }
+  ];
 
   useEffect(() => {
     scrollTo(0,0)
@@ -74,8 +229,6 @@ const Index = () => {
       if (step >= steps) {
         clearInterval(timer);
         setImpactCounts(finalCounts);
-        
-        // Impact numbers finished loading - no toast needed
       }
     }, interval);
 
@@ -87,12 +240,8 @@ const Index = () => {
       try {
         const data = await getAllSuccessStories();
         setSuccessStories(Array.isArray(data) ? data : data.stories || data.successStories || data.data || []);
-        
-        // Success stories loaded successfully - no toast needed
       } catch (err) {
         setErrorStories("Failed to load success stories");
-        
-        // Show error toast when stories fail to load
         toast.error("Unable to Load Stories. Failed to load success stories. Please try again later.");
       } finally {
         setLoadingStories(false);
@@ -231,6 +380,18 @@ const partnerLogos = [
     toast.success("Join Us - Become part of our community and make a difference!");
   };
 
+  const handleEmergencyCall = (phone: string, title: string) => {
+    toast.error(`Emergency Contact - ${title}: ${phone}`);
+    // In a real app, this could open the phone dialer
+    window.open(`tel:${phone}`);
+  };
+
+  const handleLegalInfoClick = (info: any) => {
+    setActiveLegalInfo(info);
+    setShowLegalModal(true);
+    toast.success(`Legal Resource - Opening ${info.title} information.`);
+  };
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -267,7 +428,6 @@ const partnerLogos = [
           </div>
         </div>
       </section>
-
 
       {/* About Us Preview */}
       <section className="py-20 bg-background">
@@ -331,13 +491,14 @@ const partnerLogos = [
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-4">{program.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed mb-6">{program.description}</p>
-
                 </CardContent>
               </Card>
             ))}
           </div>
         </div>
       </section>
+
+      
       <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
       {/* Impact Section */}
@@ -370,104 +531,164 @@ const partnerLogos = [
         </div>
       </section>
 
-      {/* Success Story Highlight */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                Success Stories
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Real women, real impact, real change.
-              </p>
+ {/* Success Stories - Infinite Moving Carousel */}
+<section className="py-20 bg-background">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+        Success Stories
+      </h2>
+      <p className="text-xl text-muted-foreground">
+        Real women, real impact, real change.
+      </p>
+    </div>
+    
+    {loadingStories ? (
+      <div className="text-center py-10">Loading success stories...</div>
+    ) : errorStories ? (
+      <div className="text-center text-red-500 py-10">{errorStories}</div>
+    ) : successStories.length > 0 ? (
+      <div className="relative overflow-hidden py-10">
+        {/* Double the array to create seamless looping */}
+        <div className="flex w-max animate-scroll-slow">
+          {[...successStories, ...successStories].map((story, index) => (
+            <div key={`${story.id}-${index}`} className="px-4 w-[350px]">
+              <Card 
+                className="border-border/50 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full"
+                onClick={() => {
+                  setActiveStory(story);
+                  setShowModal(true);
+                }}
+              >
+                <CardContent className="p-6 h-full flex flex-col">
+                  <div className="w-full h-48 rounded-xl bg-gradient-to-br from-primary/10 to-soft-purple/10 mb-6 overflow-hidden">
+                    <img
+                      src={`http://localhost:8000/uploads/images/${story.img}`}
+                      alt={story.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex text-primary mb-3">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className="w-4 h-4 fill-current" />
+                    ))}
+                  </div>
+                  <blockquote className="text-base text-foreground leading-relaxed mb-4 line-clamp-3">
+                    {story.story}
+                  </blockquote>
+                  <div className="mt-auto">
+                    <cite className="text-muted-foreground not-italic">
+                      <span className="font-semibold text-foreground block">{story.name}</span>
+                      <span className="text-sm">{story.position}</span>
+                    </cite>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
-            {loadingStories ? (
-              <div className="text-center py-10">Loading success stories...</div>
-            ) : errorStories ? (
-              <div className="text-center text-red-500 py-10">{errorStories}</div>
-            ) : successStories.length > 0 ? (
-              <div className="relative flex items-center justify-center">
-                <button
-                  onClick={() => {
-                    setScrollIndex((prev) => Math.max(prev - 1, 0));
-                    toast.success("Previous Story - Showing previous success story.");
-                  }}
-                  disabled={scrollIndex === 0}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-primary/80 text-white p-2 rounded-full shadow hover:bg-primary disabled:opacity-50"
-                  style={{ display: successStories.length > 1 ? 'block' : 'none' }}
-                  aria-label="Previous story"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                  </svg>
-                </button>
-                <Card className="bg-gradient-to-br from-background to-section-soft border-border/50 overflow-hidden w-full max-w-2xl mx-auto">
-                  <CardContent className="p-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-                      <div className="relative">
-                        <img
-                          src={`http://localhost:8000/uploads/${successStories[scrollIndex].img}`}
-                          alt={successStories[scrollIndex].name}
-                          className="w-full h-full object-cover min-h-[300px]"
-                        />
-                      </div>
-                      <div className="p-6 flex flex-col justify-center">
-                        <div className="mb-4">
-                          <div className="flex text-primary mb-2">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star key={star} className="w-4 h-4 fill-current" />
-                            ))}
-                          </div>
-                          <blockquote className="text-base text-foreground leading-relaxed mb-4 line-clamp-3">
-                            {successStories[scrollIndex].story}
-                          </blockquote>
-
-                          <Button
-                            variant="outline"
-                            className="mt-2 w-fit text-sm text-primary"
-                            onClick={() => {
-                              setActiveStory(successStories[scrollIndex]);
-                              setShowModal(true);
-                              toast.success(`Story Details - Opening full story of ${successStories[scrollIndex].name}.`);
-                            }}
-                          >
-                            View Full Story
-                          </Button>
-  <br />
-                          <cite className="text-muted-foreground">
-                            <span className="font-semibold text-foreground">{successStories[scrollIndex].name}</span>
-                            <br />
-                            {successStories[scrollIndex].position}
-                          </cite>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                <button
-                  onClick={() => {
-                    setScrollIndex((prev) => Math.min(prev + 1, successStories.length - 1));
-                    toast.success("Next Story - Showing next success story.");
-                  }}
-                  disabled={scrollIndex === successStories.length - 1}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-primary/80 text-white p-2 rounded-full shadow hover:bg-primary disabled:opacity-50"
-                  style={{ display: successStories.length > 1 ? 'block' : 'none' }}
-                  aria-label="Next story"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <div className="text-center py-10">No success stories available.</div>
-            )}
-          </div>
+          ))}
         </div>
-      </section>
+      </div>
+    ) : (
+      <div className="text-center py-10">No success stories available.</div>
+    )}
+  </div>
+</section>
 
+{/* Legal Awareness - Infinite Moving Carousel */}
+<section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-6 shadow-2xl">
+        <AlertTriangle className="w-10 h-10 text-white" />
+      </div>
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+        Legal Awareness & Emergency Support
+      </h2>
+      <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+        Know your rights, get help when you need it.
+      </p>
+      <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
+        <p className="text-red-800 dark:text-red-200 font-semibold flex items-center justify-center gap-2">
+          <PhoneCall className="w-5 h-5" />
+          In case of immediate danger, always call 911 first
+        </p>
+      </div>
+    </div>
 
+    <div className="relative overflow-hidden py-10">
+      {/* Double the array for seamless looping */}
+      <div className="flex w-max animate-scroll-slow">
+        {[...legalAwarenessCards, ...legalAwarenessCards].map((card, index) => (
+          <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
+            <Card 
+              className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
+              onClick={() => handleLegalInfoClick(card)}
+            >
+              <CardContent className="p-6 h-full flex flex-col">
+                <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
+                  {card.icon}
+                </div>
+                
+                <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
+                <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
+                
+                <div className="flex flex-col gap-2 mb-4">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                    <Phone className="w-4 h-4" />
+                    <span className="font-mono font-bold">{card.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-mono font-bold">{card.emergency}</span>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
+                  {card.description}
+                </p>
+
+                <div className="flex gap-2 mt-auto">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1 text-green-700 border-green-300 hover:bg-green-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEmergencyCall(card.phone, card.title);
+                    }}
+                  >
+                    <Phone className="w-4 h-4 mr-1" />
+                    Call Now
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLegalInfoClick(card);
+                    }}
+                  >
+                    Learn More
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div className="text-center mt-12">
+      <div className="bg-gradient-to-r from-primary/10 to-soft-purple/10 rounded-2xl p-8 border border-primary/20">
+        <h3 className="text-2xl font-bold text-foreground mb-4">Remember: You Are Not Alone</h3>
+        <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+          These resources are confidential, free, and available 24/7.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
       {/* Join the Movement CTA */}
       <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
         <div className="container mx-auto px-4">
@@ -488,51 +709,49 @@ const partnerLogos = [
               <Button variant="empowerment" size="lg" className="text-lg px-8 py-6" onClick={handleContactClick}>
                 <a href="/contact">Contact Us</a>
               </Button>
-
             </div>
-
-
           </div>
         </div>
       </section>
+
+      {/* Success Story Modal */}
       {showModal && activeStory && (
-  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
-    <div className="bg-white max-w-3xl w-full rounded-xl overflow-hidden shadow-2xl relative grid md:grid-cols-2">
-      
-      {/* Left: Image */}
-      <div className="h-full max-h-[600px] overflow-hidden">
-        <img
-          src={`http://localhost:8000/uploads/${activeStory.img}`}
-          alt={activeStory.name}
-          className="w-full h-full object-cover"
-        />
-      </div>
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
+          <div className="bg-white max-w-3xl w-full rounded-xl overflow-hidden shadow-2xl relative grid md:grid-cols-2">
+            
+            {/* Left: Image */}
+            <div className="h-full max-h-[600px] overflow-hidden">
+              <img
+                src={`http://localhost:8000/uploads/images/${activeStory.img}`}
+                alt={activeStory.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
 
-      {/* Right: Story Content */}
-      <div className="p-6 relative flex flex-col justify-center">
-        <button
-          onClick={() => {
-            setShowModal(false);
-            toast.success("Story Closed - Success story modal closed.");
-          }}
-          className="absolute top-4 right-4 text-gray-600 hover:text-black"
-        >
-          ✕
-        </button>
-        <h3 className="text-2xl font-bold text-primary mb-2">
-          {activeStory.name}
-        </h3>
-        <p className="text-sm text-muted-foreground mb-4">{activeStory.position}</p>
-        <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
-          {activeStory.story}
-        </p>
-      </div>
+            {/* Right: Story Content */}
+            <div className="p-6 relative flex flex-col justify-center">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  toast.success("Story Closed - Success story modal closed.");
+                }}
+                className="absolute top-4 right-4 text-gray-600 hover:text-black"
+              >
+                ✕
+              </button>
+              <h3 className="text-2xl font-bold text-primary mb-2">
+                {activeStory.name}
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4">{activeStory.position}</p>
+              <p className="text-muted-foreground whitespace-pre-line leading-relaxed">
+                {activeStory.story}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
-    </div>
-  </div>
-)}
-
-    
+      <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
 {/* Our Partners - Infinite Logo Slider */}
 <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
@@ -564,7 +783,6 @@ const partnerLogos = [
     </div>
   </div>
 </section>
-  <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
       <Footer />
     </div>
   );

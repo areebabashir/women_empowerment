@@ -25,6 +25,11 @@ const donationSchema = new mongoose.Schema({
     default : false,
     
   },
+  rejected:{
+    type:Boolean,
+    default:false,
+    
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

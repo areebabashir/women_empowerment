@@ -59,7 +59,7 @@ const Programs: React.FC<ProgramsProps> = ({ programs, onViewAll }) => {
                   {/* Image Section */}
                   <div className="md:w-1/4 lg:w-1/5">
                     <img
-                      src={`http://localhost:8000/uploads/${program.image}`}
+                      src={`http://localhost:8000/uploads/images/${program.image}`}
                       alt={program.title}
                       className="w-full h-48 md:h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
