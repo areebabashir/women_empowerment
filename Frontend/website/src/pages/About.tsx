@@ -42,7 +42,7 @@ const About = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    scrollTo(0,0)
+    scrollTo(0, 0)
     async function fetchTeams() {
       try {
         const data = await getAllTeams();
@@ -171,50 +171,81 @@ const About = () => {
           </div>
         </div>
       </section>
-      
 
-<section className="py-20 bg-section-soft">
+
+      <section className="py-20 bg-section-soft relative">
   <div className="container mx-auto px-4">
     <div className="text-center mb-16">
-      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground">
         Message from the Founder
       </h2>
     </div>
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
-      {/* Left: Image */}
-      <div className="flex justify-center lg:pl-7">
-        <div className="w-full max-w-sm rounded-3xl overflow-hidden shadow-xl">
-          <img
-            src="/2f.PNG"
-            alt="Romana Ch."
-            className="w-full h-full object-cover"
-          />
+
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
+      {/* Left: Fancy Layered Image */}
+      <div className="flex justify-center relative z-10 mt-0">
+        <div className="relative z-3">
+          {/* Outer gradient background */}
+          <div className="w-[32rem] h-[32rem] rounded-full bg-gradient-to-br from-primary to-soft-purple flex items-center justify-center shadow-2xl">
+            {/* White inner ring */}
+            <div className="w-[30rem] h-[30rem] rounded-full bg-white flex items-center justify-center shadow-xl relative">
+              {/* Inner gradient ring */}
+              <div className="w-[25rem] h-[25rem] rounded-full bg-gradient-to-br from-blue-300 via-purple-300 to-pink-300 flex items-center justify-center relative z-10">
+                {/* Image */}
+                <div className="w-[24rem] h-[24rem] rounded-full overflow-hidden flex justify-center items-center">
+                  <img
+                    src="/3fc.png"
+                    alt="Romana Ch."
+                    width={700}
+                    height={700}
+                    className="w-full h-full object-cover rounded-full object-center"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Right: Message + Name + Title */}
-      <div className="space-y-6">
-        <div className="text-muted-foreground text-lg leading-relaxed space-y-6">
+      {/* Right: Text */}
+      <div className="space-y-4 text-muted-foreground text-lg leading-relaxed">
+        <div className="space-y-4">
           <p>
-            I started this journey from Gujrat with passion and a clear purpose—to bring positive change for women and contribute to Pakistan's social and economic development.
+            I started this journey from Gujrat with passion and a clear
+            purpose—to bring positive change for women and contribute to
+            Pakistan's social and economic development.
           </p>
           <p>
-            My mission is to strengthen women in meaningful ways and provide them with opportunities at every doorstep.
+            My mission is to strengthen women in meaningful ways and provide
+            them with opportunities at every doorstep.
           </p>
           <p>
-            At <strong>Growing Women</strong>, we believe that women's financial growth is not just a dream—it's a shared responsibility. This organization was founded to empower women through education, entrepreneurship, and economic inclusion.
+            At <strong>Growing Women</strong>, we believe that women's
+            financial growth is not just a dream—it's a shared responsibility.
+            This organization was founded to empower women through education,
+            entrepreneurship, and economic inclusion.
           </p>
           <p>
-            Now, women can pursue their dreams with direction and dignity. With your support, I am committed to knocking on every door and connecting every opportunity to ensure that no woman is left behind.
+            Now, women can pursue their dreams with direction and dignity. With
+            your support, I am committed to knocking on every door and
+            connecting every opportunity to ensure that no woman is left behind.
           </p>
           <p>
-            <strong>Growing Women Prosperity Organization</strong>, originally founded as Growing Pakistan in 2020 by Miss Romana Ch in Gujrat, began as a passionate individual initiative to empower women through financial independence and entrepreneurship. In 2025, the initiative was officially registered under the name <strong>Growing Women Prosperity Organization</strong> to reflect its focused mission of uplifting women across Pakistan.
+            <strong>Growing Women Prosperity Organization</strong>, originally
+            founded as Growing Pakistan in 2020 by Miss Romana Ch in Gujrat,
+            began as a passionate individual initiative to empower women through
+            financial independence and entrepreneurship. In 2025, the initiative
+            was officially registered under the name{" "}
+            <strong>Growing Women Prosperity Organization</strong> to reflect
+            its focused mission of uplifting women across Pakistan.
           </p>
         </div>
-        <div className="flex items-center mt-6">
+        <div className="flex items-center pt-4">
           <div className="w-9 h-0.5 bg-foreground mr-4"></div>
           <div>
-            <h3 className="text-3xl font-bold text-foreground mb-1">Romana Ch.</h3>
+            <h3 className="text-3xl font-bold text-foreground mb-1">
+              Romana Ch.
+            </h3>
             <span className="text-sm font-medium text-muted-foreground uppercase tracking-widest">
               Founder / Chairperson
             </span>
@@ -225,7 +256,10 @@ const About = () => {
   </div>
 </section>
 
-<div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
+
+
+
+      <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
       {/* Our Story Timeline */}
       <section className="py-20 bg-section-soft">
         <div className="container mx-auto px-4">
@@ -255,55 +289,55 @@ const About = () => {
         </div>
       </section>
 
-     {/* Meet the Team with Infinite Auto-Scroll */}
-<section className="py-20 bg-background">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-16">
-      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-        Meet Our Team
-      </h2>
-      <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-        Passionate leaders dedicated to creating meaningful change in women's lives.
-      </p>
-    </div>
+      {/* Meet the Team with Infinite Auto-Scroll */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              Meet Our Team
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Passionate leaders dedicated to creating meaningful change in women's lives.
+            </p>
+          </div>
 
-    <div className="overflow-hidden relative p-10">
-      {loading ? (
-        <div className="text-center py-10">Loading team members...</div>
-      ) : error ? (
-        <div className="text-center text-red-500 py-10">{error}</div>
-      ) : (
-        <div
-          className="flex gap-20 w-max animate-scroll-slow px-4"
-          style={{ animationDuration: `${teamMembers.length * 4}s` }}
-        >
-          {/* Render the array twice for seamless looping */}
-          {[...teamMembers, ...teamMembers].map((member, index) => (
-            <Card 
-              key={`${member.id || index}-${index}`} 
-              className="min-w-[280px] text-center border-border/50 hover:shadow-lg transition-all duration-300"
-            >
-              <CardContent className="p-8">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-soft-purple mx-auto mb-6 overflow-hidden">
-                  <img
-                    src={member.image.startsWith('http') ? member.image : `http://localhost:8000/uploads/images/${member.image}`}
-                    alt={member.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <h3 className="text-xl font-semibold text-foreground mb-2">{member.name}</h3>
-                <p className="text-primary font-medium mb-3">{member.role}</p>
-                <p className="text-m text-muted-foreground whitespace-pre-line line-clamp-4 h-[30px] overflow-hidden">
-                  {member.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          <div className="overflow-hidden relative p-10">
+            {loading ? (
+              <div className="text-center py-10">Loading team members...</div>
+            ) : error ? (
+              <div className="text-center text-red-500 py-10">{error}</div>
+            ) : (
+              <div
+                className="flex gap-20 w-max animate-scroll-slow px-4"
+                style={{ animationDuration: `${teamMembers.length * 4}s` }}
+              >
+                {/* Render the array twice for seamless looping */}
+                {[...teamMembers, ...teamMembers].map((member, index) => (
+                  <Card
+                    key={`${member.id || index}-${index}`}
+                    className="min-w-[280px] text-center border-border/50 hover:shadow-lg transition-all duration-300"
+                  >
+                    <CardContent className="p-8">
+                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-soft-purple mx-auto mb-6 overflow-hidden">
+                        <img
+                          src={member.image.startsWith('http') ? member.image : `http://localhost:8000/uploads/images/${member.image}`}
+                          alt={member.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-2">{member.name}</h3>
+                      <p className="text-primary font-medium mb-3">{member.role}</p>
+                      <p className="text-m text-muted-foreground whitespace-pre-line line-clamp-4 h-[30px] overflow-hidden">
+                        {member.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
-    </div>
-  </div>
-</section>
+      </section>
 
       {/* Core Values */}
       <section className="py-20 bg-section-soft">
