@@ -318,11 +318,12 @@ const Gallery = () => {
           let images = [];
           if (item.images && Array.isArray(item.images)) {
             images = item.images.map(img => 
-              img.startsWith('http') ? img : `http://localhost:8000/uploads/images/${img}`
+              img.startsWith('http') ? img : `http://localhost:8000/${img}`
             );
           } else if (item.imageUrl) {
-            images = [item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:8000/uploads/images/${item.imageUrl}`];
+            images = [item.imageUrl.startsWith('http') ? item.imageUrl : `http://localhost:8000/${item.imageUrl}`];
           }
+          console.log(images)
           
           return {
             id: item._id || item.id,

@@ -10,6 +10,8 @@ interface DonationsProps {
 
 const Donations: React.FC<DonationsProps> = ({ donations, onViewAll }) => {
 
+  console.log(donations)
+
   const navigate = useNavigate()
   const totalDonated = donations.reduce((sum, donation) => sum + donation.amount, 0);
 
