@@ -36,7 +36,7 @@ function UpdateEventForm() {
           description: response.data.event.description,
           image: null,
           imageUrl: response.data.event.image
-            ? `http://localhost:8000/uploads/${response.data.event.image}`
+            ? `http://localhost:8000/uploads/images/${response.data.event.image}`
             : '/default-event-image.jpg',
           date: response.data.event.date ? response.data.event.date.slice(0, 10) : '',
           day: response.data.event.day,

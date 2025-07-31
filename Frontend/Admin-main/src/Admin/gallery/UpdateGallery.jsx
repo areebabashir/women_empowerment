@@ -75,7 +75,7 @@ const UpdateGallery = () => {
           // Handle multiple images
           if (item.images && Array.isArray(item.images) && item.images.length > 0) {
             const imageUrls = item.images.map(img => 
-              img.startsWith('http') ? img : `http://localhost:8000/uploads/${img}`
+              img.startsWith('http') ? img : `http://localhost:8000/uploads/images/${img}`
             );
             setExistingImages(imageUrls);
             setCurrentImageUrl(imageUrls[0]);
@@ -84,7 +84,7 @@ const UpdateGallery = () => {
           } else if (item.imageUrl) {
             const imageUrl = item.imageUrl.startsWith('http') 
               ? item.imageUrl 
-              : `http://localhost:8000/uploads/${item.imageUrl}`;
+              : `http://localhost:8000/uploads/images/${item.imageUrl}`;
             setExistingImages([imageUrl]);
             setCurrentImageUrl(imageUrl);
             setPreviewUrl(imageUrl);
