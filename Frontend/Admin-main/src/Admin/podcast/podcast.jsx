@@ -21,7 +21,7 @@ import AdminLayout from "../../layouts/AdminLayout";
 const getVideoUrl = (video) => {
   if (!video) return '';
   if (video.startsWith('http')) return video;
-  return `http://localhost:8000/uploads/${video}`;
+  return `http://localhost:8000/uploads/video/${video}`;
 };
 
 const PodcastData = ({ podcastData, currentPage, itemsPerPage, setPodcastData }) => {
