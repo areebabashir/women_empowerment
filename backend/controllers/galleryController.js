@@ -18,10 +18,10 @@ export const createGallery = async (req, res) => {
       });
     }
     
-    // Handle multiple images
+    // Handle multiple images - save full paths
     let images = [];
     if (req.files && req.files.length > 0) {
-      images = req.files.map(file => file.filename);
+      images = req.files.map(file => `uploads/images/${file.filename}`);
     }
     
     // Ensure we have at least one image
@@ -154,7 +154,7 @@ export const updateGallery = async (req, res) => {
     
     // Add new uploaded images
     if (req.files && req.files.length > 0) {
-      const newImageFilenames = req.files.map(file => file.filename);
+      const newImageFilenames = req.files.map(file => `uploads/images/${file.filename}`);
       finalImages = [...finalImages, ...newImageFilenames];
     }
     

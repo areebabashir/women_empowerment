@@ -143,9 +143,7 @@ const StoryData = ({ storyData, currentPage, itemsPerPage, setStoryData, onAddSu
                   <img
                     src={
                       selectedStory.img
-                        ? selectedStory.img.startsWith('http')
-                          ? selectedStory.img
-                          : `http://localhost:8000/uploads/${selectedStory.img}`
+                        ? (selectedStory.img.startsWith('http') ? selectedStory.img : `http://localhost:8000/${selectedStory.img}`)
                         : '/default-profile.jpg'
                     }
                     alt={selectedStory.name}
@@ -308,7 +306,7 @@ const SuccessStories = () => {
         position: story.position,
         story: story.story,
         img: story.img 
-          ? `http://localhost:8000/uploads/${story.img}`
+          ? (story.img.startsWith('http') ? story.img : `http://localhost:8000/${story.img}`)
           : 'https://randomuser.me/api/portraits/lego/1.jpg',
         createdAt: story.createdAt || new Date().toISOString()
       }));
