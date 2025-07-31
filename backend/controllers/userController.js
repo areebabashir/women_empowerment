@@ -13,12 +13,24 @@ export const registerUser = async (req, res) => {
     console.log('req.files:', req.files);
     console.log('req.file:', req.file);
     
-    const { name, email, password, role, phone, address,  } = req.body;
+    const { name, email, password, role, phone, address } = req.body;
+    
+    // Validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ msg: 'Name, email, and password are required' });
+    }
     
     // Check if user already exists
     let user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({ msg: 'User Already exists' });
+    }
+
+    // Validate NGO documents requirement
+    if (role === 'ngo') {
+      if (!req.files || !req.files['documents'] || req.files['documents'].length === 0) {
+        return res.status(400).json({ msg: 'Documents are required for NGO registration' });
+      }
     }
 
     // Hash password
@@ -36,16 +48,29 @@ export const registerUser = async (req, res) => {
 
     console.log('User data before files:', userData);
 
-    // Add image path if file was uploaded (only if multer was used)
+    // Add image path if file was uploaded
     if (req.files && req.files['image'] && req.files['image'][0]) {
       userData.image = `uploads/images/${req.files['image'][0].filename}`;
       console.log('Image added:', userData.image);
     }
 
-    // Add documents if files were uploaded (for NGO role) - only if multer was used
+    // Add documents if files were uploaded (for NGO role)
     if (req.files && req.files['documents'] && req.files['documents'].length > 0) {
       userData.documents = req.files['documents'].map(file => `uploads/documents/${file.filename}`);
       console.log('Documents added:', userData.documents);
+      
+      // If user is NGO, copy documents to company_ngo folder
+      if (role === 'ngo') {
+        try {
+          const copyPromises = req.files['documents'].map(file => 
+            copyToCompanyFolder(file.path, file.filename)
+          );
+          await Promise.all(copyPromises);
+        } catch (copyError) {
+          console.error('Error copying files to company_ngo folder:', copyError);
+          // Don't fail registration if copy fails, just log the error
+        }
+      }
     }
 
     console.log('Final user data:', userData);
@@ -54,6 +79,7 @@ export const registerUser = async (req, res) => {
     user = await User.create(userData);
 
     res.status(201).json({ 
+      success: true,
       msg: 'User registered successfully',
       user: {
         id: user._id,
@@ -68,7 +94,11 @@ export const registerUser = async (req, res) => {
   } catch (error) {
     console.error('Registration error:', error);
     console.error('Error stack:', error.stack);
-    res.status(500).json({ msg: 'Server error', error: error.message });
+    res.status(500).json({ 
+      success: false,
+      msg: 'Server error', 
+      error: error.message 
+    });
   }
 };
 import { copyToCompanyFolder } from '../helpers/multerConfig.js';

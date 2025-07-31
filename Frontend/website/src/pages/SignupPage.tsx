@@ -36,7 +36,7 @@ const SignUpPage = () => {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
@@ -51,16 +51,16 @@ const SignUpPage = () => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
       const validDocumentTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-      
+
       const invalidFiles = files.filter(file => !validDocumentTypes.includes(file.type));
       if (invalidFiles.length > 0) {
         setErrors(prev => ({
           ...prev,
           documents: "Documents must be PDF, DOC, or DOCX format"
-        }));
+        }));  
         return;
       }
-      
+
       const oversizedFiles = files.filter(file => file.size > 10 * 1024 * 1024);
       if (oversizedFiles.length > 0) {
         setErrors(prev => ({
@@ -69,7 +69,7 @@ const SignUpPage = () => {
         }));
         return;
       }
-      
+
       if (files.length > 10) {
         setErrors(prev => ({
           ...prev,
@@ -77,7 +77,7 @@ const SignUpPage = () => {
         }));
         return;
       }
-      
+
       setDocuments(files);
       setErrors(prev => ({
         ...prev,
@@ -164,63 +164,71 @@ const SignUpPage = () => {
   };
 
   const handleSignup = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
+  
+  if (!validateForm()) {
+    setLoading(false);
+    return;
+  }
+
+  try {
+    // Use FormData when files need to be uploaded
+    const formDataToSend = new FormData();
     
-    if (!validateForm()) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Send as JSON data instead of FormData for testing
-      const userData = {
-        name: formData.name,
-        email: formData.email.trim().toLowerCase(),
-        password: formData.password,
-        role: formData.role,
-        phone: formData.phone,
-        address: formData.address,
-      };
-
-      console.log('User data being sent:', userData);
-
-      const response = await apiCall({
-        url: `${API_BASE_URL}/users/register`,
-        method: "POST",
-        data: userData,
-        requiresAuth: false,
+    // Append all form fields
+    formDataToSend.append('name', formData.name);
+    formDataToSend.append('email', formData.email.trim().toLowerCase());
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('role', formData.role);
+    formDataToSend.append('phone', formData.phone);
+    formDataToSend.append('address', formData.address);
+    
+    // Append files if they exist
+    if (documents.length > 0) {
+      documents.forEach((file, index) => {
+        formDataToSend.append('documents', file);
       });
+    }
+    
+    console.log('FormData being sent with files:', documents.length);
 
-      if (response.success) {
-        // Show success toast
-        toast.success("Registration Successful! Account created successfully. Please log in.");
-        
-        navigate("/login");
-      } else {
-        const errorMessage = response.data.msg || "Registration failed";
-        setErrors(prev => ({
-          ...prev,
-          general: [errorMessage]
-        }));
-        
-        // Show error toast
-        toast.error(`Registration Failed - ${errorMessage}`);
-      }
-    } catch (err) {
-      const errorMessage = err.message || "Network error occurred";
+    const response = await apiCall({
+      url: `${API_BASE_URL}/users/register`,
+      method: "POST",
+      data: formDataToSend,
+      requiresAuth: false,
+      isFormData: true, // Add this flag if your apiCall function needs to handle FormData differently
+    });
+
+    if (response.success) {
+      // Show success toast
+      toast.success("Registration Successful! Account created successfully. Please log in.");
+      
+      navigate("/login");
+    } else {
+      const errorMessage = response.data.msg || "Registration failed";
       setErrors(prev => ({
         ...prev,
         general: [errorMessage]
       }));
       
       // Show error toast
-      toast.error(`Network Error - ${errorMessage}`);
-    } finally {
-      setLoading(false);
+      toast.error(`Registration Failed - ${errorMessage}`);
     }
-  };
-
+  } catch (err) {
+    const errorMessage = err.message || "Network error occurred";
+    setErrors(prev => ({
+      ...prev,
+      general: [errorMessage]
+    }));
+    
+    // Show error toast
+    toast.error(`Network Error - ${errorMessage}`);
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       <Header />
@@ -239,68 +247,68 @@ const SignUpPage = () => {
 
           <form onSubmit={handleSignup} className="space-y-4">
             <div>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 name="name"
-                placeholder=" Name *" 
-                value={formData.name} 
+                placeholder=" Name *"
+                value={formData.name}
                 onChange={handleChange}
-                disabled={loading} 
+                disabled={loading}
               />
               {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
             </div>
 
             <div>
-              <Input 
-                type="email" 
+              <Input
+                type="email"
                 name="email"
-                placeholder="Email *" 
-                value={formData.email} 
+                placeholder="Email *"
+                value={formData.email}
                 onChange={handleChange}
-                disabled={loading} 
+                disabled={loading}
               />
               {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email}</p>}
             </div>
 
             <div>
-              <Input 
-                type="password" 
+              <Input
+                type="password"
                 name="password"
-                placeholder="Password *" 
-                value={formData.password} 
+                placeholder="Password *"
+                value={formData.password}
                 onChange={handleChange}
-                disabled={loading} 
+                disabled={loading}
               />
               {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password}</p>}
             </div>
 
             <div>
-              <Input 
-                type="tel" 
+              <Input
+                type="tel"
                 name="phone"
-                placeholder="Phone Number (e.g., +923001234567)" 
-                value={formData.phone} 
+                placeholder="Phone Number (e.g., +923001234567)"
+                value={formData.phone}
                 onChange={handleChange}
-                disabled={loading} 
+                disabled={loading}
               />
               {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone}</p>}
             </div>
 
             <div>
-              <Input 
-                type="text" 
+              <Input
+                type="text"
                 name="address"
-                placeholder="Address" 
-                value={formData.address} 
+                placeholder="Address"
+                value={formData.address}
                 onChange={handleChange}
-                disabled={loading} 
+                disabled={loading}
               />
             </div>
 
-            <select 
-              value={formData.role} 
-              onChange={(e) => setFormData(prev => ({...prev, role: e.target.value}))} 
-              disabled={loading} 
+            <select
+              value={formData.role}
+              onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value }))}
+              disabled={loading}
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-soft-purple"
             >
               <option value="member">As a Member</option>
@@ -346,13 +354,13 @@ const SignUpPage = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   NGO Documents * (PDF, DOC, DOCX - Max 10 files, 10MB each)
                 </label>
-                <input 
-                  type="file" 
-                  accept=".pdf,.doc,.docx" 
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx"
                   multiple
-                  onChange={handleDocumentChange} 
-                  disabled={loading} 
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-soft-purple" 
+                  onChange={handleDocumentChange}
+                  disabled={loading}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-soft-purple"
                 />
                 {documents.length > 0 && (
                   <p className="mt-1 text-sm text-green-600">

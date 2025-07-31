@@ -144,7 +144,7 @@ const Podcasts = () => {
                     <div className="md:flex items-start gap-6">
                       {/* Thumbnail with Play Icon */}
                       <div
-                        onClick={() => openVideo(`http://localhost:8000/uploads/${podcast.video}`)}
+                        onClick={() => openVideo(`http://localhost:8000/uploads/videos/${podcast.video}`)}
                         className="relative bg-gradient-to-br from-primary/10 to-lilac/20 rounded-lg min-w-[100px] h-24 cursor-pointer flex items-center justify-center"
                       >
                         <Play className="text-primary w-8 h-8" />
@@ -186,7 +186,7 @@ const Podcasts = () => {
                           <div className="flex gap-2">
                             <Button
                               size="sm"
-                              onClick={() => openVideo(`http://localhost:8000/uploads/${podcast.video}`)}
+                              onClick={() => openVideo(`http://localhost:8000/uploads/videos/${podcast.video}`)}
                             >
                               <Play className="mr-2 h-4 w-4" />
                               Watch Now

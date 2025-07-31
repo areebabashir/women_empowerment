@@ -301,41 +301,45 @@ const About = () => {
             </p>
           </div>
 
-          <div className="overflow-hidden relative p-10">
-            {loading ? (
-              <div className="text-center py-10">Loading team members...</div>
-            ) : error ? (
-              <div className="text-center text-red-500 py-10">{error}</div>
-            ) : (
-              <div
-                className="flex gap-20 w-max animate-scroll-slow px-4"
-                style={{ animationDuration: `${teamMembers.length * 4}s` }}
-              >
-                {/* Render the array twice for seamless looping */}
-                {[...teamMembers, ...teamMembers].map((member, index) => (
-                  <Card
-                    key={`${member.id || index}-${index}`}
-                    className="min-w-[280px] text-center border-border/50 hover:shadow-lg transition-all duration-300"
-                  >
-                    <CardContent className="p-8">
-                      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-soft-purple mx-auto mb-6 overflow-hidden">
-                        <img
-                          src={member.image.startsWith('http') ? member.image : `http://localhost:8000/uploads/images/${member.image}`}
-                          alt={member.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <h3 className="text-xl font-semibold text-foreground mb-2">{member.name}</h3>
-                      <p className="text-primary font-medium mb-3">{member.role}</p>
-                      <p className="text-m text-muted-foreground whitespace-pre-line line-clamp-4 h-[30px] overflow-hidden">
-                        {member.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                ))}
+
+    <div className="overflow-hidden relative p-10">
+      {loading ? (
+        <div className="text-center py-10">Loading team members...</div>
+      ) : error ? (
+        <div className="text-center text-red-500 py-10">{error}</div>
+      ) : (
+        <div
+          className="flex gap-20 w-max animate-scroll-slow px-4"
+          style={{ animationDuration: `${teamMembers.length * 4}s` }}
+        >
+          {/* Render the array twice for seamless looping */}
+          {[...teamMembers, ...teamMembers].map((member, index) => (
+            <Card 
+              key={`${member.id || index}-${index}`} 
+              className="min-w-[280px] text-center border-border/50 hover:shadow-lg transition-all duration-300"
+            >
+              <CardContent className="p-8">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-soft-purple mx-auto mb-6 overflow-hidden">
+                  <img
+                    src={member.image.startsWith('http') ? member.image : `http://localhost:8000/${member.image}`}
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">{member.name}</h3>
+                <p className="text-primary font-medium mb-3">{member.role}</p>
+                <p className="text-m text-muted-foreground whitespace-pre-line line-clamp-4 h-[30px] overflow-hidden">
+                  {member.description}
+                </p>
+              </CardContent>
+            </Card>
+          ))}
+
+      
               </div>
             )}
           </div>
+
         </div>
       </section>
 
