@@ -143,7 +143,7 @@ const Programs = () => {
                 >
                   <div className="relative group aspect-video">
                     <img
-                      src={`http://localhost:8000/uploads/${program.image}`}
+                      src={`http://localhost:8000/uploads/images/${program.image}`}
                       alt={program.title}
                       className="w-full h-full object-cover rounded-t-md"
                     />

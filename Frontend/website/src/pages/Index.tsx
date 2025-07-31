@@ -30,6 +30,7 @@ import successStoryImage from "@/assets/success-story-woman.jpg";
 import { useEffect, useState } from "react";
 import { getAllSuccessStories } from "@/services/api";
 import toast from "react-hot-toast";
+import { getImageUrl } from "@/utils/imageUtils";
 
 const Index = () => {
   const [impactCounts, setImpactCounts] = useState({
@@ -563,7 +564,7 @@ const partnerLogos = [
                 <CardContent className="p-6 h-full flex flex-col">
                   <div className="w-full h-48 rounded-xl bg-gradient-to-br from-primary/10 to-soft-purple/10 mb-6 overflow-hidden">
                     <img
-                      src={`http://localhost:8000/uploads/${story.img}`}
+                      src={getImageUrl(`uploads/${story.img}`)}
                       alt={story.name}
                       className="w-full h-full object-cover"
                     />
@@ -722,7 +723,7 @@ const partnerLogos = [
             {/* Left: Image */}
             <div className="h-full max-h-[600px] overflow-hidden">
               <img
-                src={`http://localhost:8000/uploads/${activeStory.img}`}
+                src={`http://localhost:8000/uploads/images/${activeStory.img}`}
                 alt={activeStory.name}
                 className="w-full h-full object-cover"
               />

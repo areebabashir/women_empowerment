@@ -422,7 +422,7 @@ const Events = () => {
             name: event.name,
             description: event.description,
             image: event.image
-              ? (event.image.startsWith('http') ? event.image : `http://localhost:8000/uploads/${event.image}`)
+              ? (event.image.startsWith('http') ? event.image : `http://localhost:8000/uploads/images/${event.image}`)
               : '/default-event-image.jpg',
             date: event.date,
             time: event.time,

@@ -114,20 +114,6 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
-@keyframes scroll-slow {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-scroll-slow {
-  animation-name: scroll-slow;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
 @keyframes scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); } /* Half the width since we doubled the content */
