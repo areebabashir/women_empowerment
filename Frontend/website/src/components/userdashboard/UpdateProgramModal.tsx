@@ -227,7 +227,7 @@ const UpdateProgramModal: React.FC<UpdateProgramModalProps> = ({ isOpen, onClose
                 Current Image
               </label>
               <img
-                src={`${API_BASE_URL.replace('/api', '')}/uploads/${program.image}`}
+                src={`${API_BASE_URL.replace('/api', '')}/uploads/images/${program.image}`}
                 alt="Current program image"
                 className="w-32 h-32 object-cover rounded-lg border"
               />

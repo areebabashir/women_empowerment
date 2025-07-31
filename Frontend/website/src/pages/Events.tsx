@@ -147,7 +147,7 @@ const Events = () => {
                     onClick={() => setSelectedEvent({ ...event, showOverlay: true })}
                   >
                     <img
-                      src={`http://localhost:8000/uploads/${event.image}`}
+                      src={`http://localhost:8000/uploads/images/${event.image}`}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -185,7 +185,7 @@ const Events = () => {
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="max-w-4xl w-full relative">
             <img
-              src={`http://localhost:8000/uploads/${selectedEvent.image}`}
+              src={`http://localhost:8000/uploads/images/${selectedEvent.image}`}
               alt={selectedEvent.title}
               className="w-full h-auto rounded-lg shadow-lg"
             />
@@ -205,7 +205,7 @@ const Events = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 space-y-4 overflow-y-auto max-h-[90vh]">
             <img
-              src={`http://localhost:8000/uploads/${viewMoreEvent.image}`}
+              src={`http://localhost:8000/uploads/images/${viewMoreEvent.image}`}
               alt={viewMoreEvent.title}
               className="w-full h-64 object-cover rounded-md mb-4"
             />

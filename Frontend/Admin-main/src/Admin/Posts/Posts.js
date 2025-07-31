@@ -258,7 +258,7 @@ const Posts = () => {
           title: post.name,
           description: post.description,
           image: post.image
-            ? `http://localhost:8000/uploads/${post.image}`
+            ? `http://localhost:8000/uploads/images/${post.image}`
             : '/default-post-image.jpg',
           isPublished: post.isPublished || false,
           publicationDate: post.publicationDate,

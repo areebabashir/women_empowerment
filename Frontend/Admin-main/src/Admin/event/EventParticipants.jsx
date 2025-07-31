@@ -176,7 +176,7 @@ const EventParticipants = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center space-x-4">
                 <img
-                  src={event.image ? (event.image.startsWith('http') ? event.image : `http://localhost:8000/uploads/${event.image}`) : '/default-event-image.jpg'}
+                  src={event.image ? (event.image.startsWith('http') ? event.image : `http://localhost:8000/uploads/images/${event.image}`) : '/default-event-image.jpg'}
                   alt={event.name}
                   className="w-16 h-16 object-cover rounded-lg"
                   onError={(e) => {

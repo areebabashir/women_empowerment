@@ -219,7 +219,7 @@ const CompanyPrograms: React.FC<CompanyProgramsProps> = ({ user }) => {
           <div key={program._id} className="bg-white rounded-lg shadow-md overflow-hidden">
             {program.image && (
               <img
-                src={`${API_BASE_URL.replace('/api', '')}/uploads/${program.image}`}
+                src={`${API_BASE_URL.replace('/api', '')}/uploads/images/${program.image}`}
                 alt={program.title}
                 className="w-full h-48 object-cover"
               />

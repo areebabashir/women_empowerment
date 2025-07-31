@@ -101,7 +101,7 @@ const Blog = () => {
                 <div className="w-full md:w-1/2 aspect-video md:aspect-auto bg-gradient-to-br from-primary/10 to-lilac/20 flex items-center justify-center">
                   {featuredBlog.image ? (
                     <img
-                      src={`http://localhost:8000/uploads/${featuredBlog.image}`}
+                      src={`http://localhost:8000/uploads/images/${featuredBlog.image}`}
                       alt={featuredBlog.name}
                       className="w-full h-full object-cover"
                     />
@@ -167,7 +167,7 @@ const Blog = () => {
                   <div className="aspect-video bg-gradient-to-br from-primary/10 to-lilac/20 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
                     {post.image ? (
                       <img
-                        src={`http://localhost:8000/uploads/${post.image}`}
+                        src={`http://localhost:8000/uploads/images/${post.image}`}
                         alt={post.name}
                         className="w-full h-full object-cover"
                       />
@@ -237,7 +237,7 @@ const Blog = () => {
             </DialogHeader>
             <div className="space-y-4">
               <img
-                src={`http://localhost:8000/uploads/${selectedBlog.image}`}
+                src={`http://localhost:8000/uploads/images/${selectedBlog.image}`}
                 alt={selectedBlog.name}
                 className="w-full h-64 object-cover rounded-md"
               />

@@ -209,7 +209,7 @@ const ProgramParticipants = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center space-x-4">
                 <img
-                  src={program.image ? `http://localhost:8000/uploads/${program.image}` : '/default-program-image.jpg'}
+                  src={program.image ? `http://localhost:8000/uploads/images/${program.image}` : '/default-program-image.jpg'}
                   alt={program.title || program.name}
                   className="w-16 h-16 object-cover rounded-lg"
                   onError={(e) => {
