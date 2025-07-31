@@ -37,8 +37,8 @@ const handleMulterError = (err, req, res, next) => {
   next();
 };
 
-// Public routes
-router.post('/register', registerUser);
+// Public routes - ADD MULTER MIDDLEWARE TO REGISTER ROUTE
+router.post('/register', userUpload, handleMulterError, registerUser);
 router.post('/login', loginUser);
 
 // User routes

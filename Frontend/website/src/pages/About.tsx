@@ -286,7 +286,7 @@ const About = () => {
               <CardContent className="p-8">
                 <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-soft-purple mx-auto mb-6 overflow-hidden">
                   <img
-                    src={member.image.startsWith('http') ? member.image : `http://localhost:8000/uploads/images/${member.image}`}
+                    src={member.image.startsWith('http') ? member.image : `http://localhost:8000/${member.image}`}
                     alt={member.name}
                     className="w-full h-full object-cover"
                   />

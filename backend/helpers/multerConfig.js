@@ -4,6 +4,7 @@ import fs from 'fs';
 
 // Define allowed extensions for images and documents
 const allowedImageTypes = /jpeg|jpg|png|gif/;
+const allowedVideoTypes = /mp4|mov|avi|mkv/;
 const allowedDocTypes = /pdf|doc|docx/;
 
 // Ensure directories exist
@@ -16,21 +17,23 @@ const ensureDirectoryExists = (dirPath) => {
 // Storage configuration
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    if (file.fieldname === 'image') {
-      cb(null, 'uploads/images');
-    } else if (file.fieldname === 'img') {
-      cb(null, 'uploads/images');
-    } else if (file.fieldname === 'pic') {
-      cb(null, 'uploads/images');
-    } else if (file.fieldname === 'images') {
-      cb(null, 'uploads/images');
+    let uploadPath;
+    
+    if (['image', 'img', 'pic', 'images'].includes(file.fieldname)) {
+      uploadPath = 'uploads/images';
     } else if (file.fieldname === 'documents') {
-      cb(null, 'uploads/documents');
+      uploadPath = 'uploads/documents';
     } else if (file.fieldname === 'receipt') {
-      cb(null, 'uploads/receipts');
+      uploadPath = 'uploads/receipts';
+    } else if (file.fieldname === 'video') {
+      uploadPath = 'uploads/videos';
     } else {
-      cb(new Error('Invalid fieldname'));
+      return cb(new Error('Invalid fieldname'));
     }
+    
+    // Ensure the directory exists before using it
+    ensureDirectoryExists(uploadPath);
+    cb(null, uploadPath);
   },
   filename: function (req, file, cb) {
     const filename = `${Date.now()}-${file.originalname}`;
@@ -40,6 +43,8 @@ const storage = multer.diskStorage({
 
 // File filter function - only apply when files are actually uploaded
 function fileFilter(req, file, cb) {
+  console.log('Incoming file field:', file.fieldname);
+
   // If no file is provided, skip validation
   if (!file) {
     return cb(null, true);
@@ -48,13 +53,14 @@ function fileFilter(req, file, cb) {
   const extname = path.extname(file.originalname).toLowerCase().substring(1);
 
   if (
-    ((file.fieldname === 'image' || file.fieldname === 'img' || file.fieldname === 'pic' || file.fieldname === 'images') && allowedImageTypes.test(extname)) ||
+    (['image', 'img', 'pic', 'images'].includes(file.fieldname) && allowedImageTypes.test(extname)) ||
     (file.fieldname === 'documents' && allowedDocTypes.test(extname)) ||
-    (file.fieldname === 'receipt' && (allowedImageTypes.test(extname) || allowedDocTypes.test(extname)))
+    (file.fieldname === 'receipt' && (allowedImageTypes.test(extname) || allowedDocTypes.test(extname))) ||
+    (file.fieldname === 'video' && allowedVideoTypes.test(extname))
   ) {
     cb(null, true);
   } else {
-    cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', 'Invalid file type'));
+    cb(new multer.MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname));
   }
 }
 
@@ -63,10 +69,10 @@ const copyToCompanyFolder = (filePath, filename) => {
   return new Promise((resolve, reject) => {
     const companyNgoDir = 'uploads/company_ngo';
     ensureDirectoryExists(companyNgoDir);
-    
+
     const sourcePath = filePath;
     const destPath = path.join(companyNgoDir, filename);
-    
+
     fs.copyFile(sourcePath, destPath, (err) => {
       if (err) {
         console.error('Error copying file to company_ngo folder:', err);
@@ -79,8 +85,8 @@ const copyToCompanyFolder = (filePath, filename) => {
   });
 };
 
-const upload = multer({ 
-  storage, 
+const upload = multer({
+  storage,
   fileFilter,
   limits: {
     fileSize: 10 * 1024 * 1024 // 10MB limit
