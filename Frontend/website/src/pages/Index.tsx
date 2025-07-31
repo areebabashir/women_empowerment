@@ -100,7 +100,62 @@ const Index = () => {
     }
     fetchStories();
   }, [toast]);
-
+const partnerLogos = [
+  {
+    name: "Women's Foundation",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <rect width="100" height="40" rx="5" fill="#8b5cf6" />
+        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
+      </svg>
+    )
+  },
+  {
+    name: "Global Empowerment",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <circle cx="20" cy="20" r="15" fill="#ec4899" />
+        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
+      </svg>
+    )
+  },
+  {
+    name: "Equal Rights Initiative",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
+        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
+      </svg>
+    )
+  },
+  {
+    name: "Education First",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <polygon points="50,0 100,40 0,40" fill="#10b981" />
+        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
+      </svg>
+    )
+  },
+  {
+    name: "Health & Wellness",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
+        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
+      </svg>
+    )
+  },
+  {
+    name: "Future Leaders",
+    component: (
+      <svg viewBox="0 0 100 40" className="h-12 w-auto">
+        <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
+        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
+      </svg>
+    )
+  }
+];
   const programs = [
     {
       icon: <GraduationCap className="w-8 h-8" />,
@@ -479,7 +534,36 @@ const Index = () => {
 
       <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
+{/* Our Partners - Infinite Logo Slider */}
+<section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-12">
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+        Our Trusted Partners
+      </h2>
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Collaborating with leading organizations to empower women worldwide
+      </p>
+    </div>
 
+    <div className="relative overflow-hidden py-6">
+      <div className="flex w-max animate-scroll-slow items-center">
+        {/* Double the array for seamless looping */}
+        {[...partnerLogos, ...partnerLogos].map((logo, index) => (
+          <div 
+            key={`${logo.name}-${index}`} 
+            className="px-8 flex items-center justify-center"
+            style={{ minWidth: '200px' }}
+          >
+            <div className="grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100">
+              {logo.component}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
       <Footer />
     </div>
   );

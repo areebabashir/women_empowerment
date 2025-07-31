@@ -1,6 +1,6 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome, faCalendarAlt, faFileAlt, faUserCircle, faUserGraduate, faProjectDiagram, faStar, faUsers, faSignOutAlt, faUser, faEnvelope, faImages, faPodcast } from "@fortawesome/free-solid-svg-icons";
+import { faHome, faCalendarAlt, faFileAlt, faUserCircle, faUserGraduate, faProjectDiagram, faStar, faUsers, faSignOutAlt, faUser, faEnvelope, faImages, faPodcast, faLightbulb } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
 
 function SideBar() {
@@ -11,11 +11,11 @@ function SideBar() {
     { to: "/Admin/Events", icon: faCalendarAlt, label: "Event" },
     { to: "/Admin/Posts", icon: faFileAlt, label: "Blog" },
     { to: "/Admin/Program", icon: faProjectDiagram, label: "Program" },
-
     { to: "/Admin/SuccessStories", icon: faStar, label: "Success Stories" },
     { to: "/Admin/Gallery", icon: faImages, label: "Gallery" },
     { to: "/Admin/Donations", icon: faImages, label: "Donation" },
     { to: "/Admin/Podcast", icon: faPodcast, label: "Podcast" },
+    { to: "/Admin/Awareness", icon: faLightbulb, label: "Legal Awareness" },
     { to: "/Admin/Users", icon: faUser, label: "Users" },
     { to: "/Admin/contact", icon: faEnvelope, label: "Contact" },
     { to: "/Admin/Team", icon: faUsers, label: "Team" },

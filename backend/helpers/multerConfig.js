@@ -18,6 +18,12 @@ const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     if (file.fieldname === 'image') {
       cb(null, 'uploads/images');
+    } else if (file.fieldname === 'img') {
+      cb(null, 'uploads/images');
+    } else if (file.fieldname === 'pic') {
+      cb(null, 'uploads/images');
+    } else if (file.fieldname === 'images') {
+      cb(null, 'uploads/images');
     } else if (file.fieldname === 'documents') {
       cb(null, 'uploads/documents');
     } else if (file.fieldname === 'receipt') {
@@ -42,7 +48,7 @@ function fileFilter(req, file, cb) {
   const extname = path.extname(file.originalname).toLowerCase().substring(1);
 
   if (
-    (file.fieldname === 'image' && allowedImageTypes.test(extname)) ||
+    ((file.fieldname === 'image' || file.fieldname === 'img' || file.fieldname === 'pic' || file.fieldname === 'images') && allowedImageTypes.test(extname)) ||
     (file.fieldname === 'documents' && allowedDocTypes.test(extname)) ||
     (file.fieldname === 'receipt' && (allowedImageTypes.test(extname) || allowedDocTypes.test(extname)))
   ) {
