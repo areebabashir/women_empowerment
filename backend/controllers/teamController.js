@@ -41,11 +41,12 @@ export const addTeamMember = async (req, res) => {
     
     let pic = null;
     if (req.file) {
-      pic = req.file.filename;
-      console.log('Image uploaded:', req.file.filename);
+      // Save the full path to the image
+      pic = `uploads/images/${req.file.filename}`;
+      console.log('Image uploaded:', pic);
     } else {
       // Use a default image if none provided
-      pic = 'default-team-member.jpg';
+      pic = 'uploads/images/default-team-member.jpg';
       console.log('No image provided, using default');
     }
     
@@ -105,8 +106,8 @@ export const editTeam = async (req, res) => {
     
     // Only update image if a new file is uploaded
     if (req.file) {
-      updateData.pic = req.file.filename;
-      console.log('New image uploaded:', req.file.filename);
+      updateData.pic = `uploads/images/${req.file.filename}`;
+      console.log('New image uploaded:', updateData.pic);
     }
     
     console.log('Updating team with data:', updateData);

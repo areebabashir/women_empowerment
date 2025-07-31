@@ -10,18 +10,21 @@ import {
   faSearch,
   faTimes,
   faSpinner,
-  faUserTie,
-  faSave
+  faSave,
+  faToggleOn,
+  faToggleOff
 } from '@fortawesome/free-solid-svg-icons';
 import AdminLayout from '../../layouts/AdminLayout';
 
-// AddTeamModal component
-const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
+// AddAwarenessModal component
+const AddAwarenessModal = ({ showModal, setShowModal, onAwarenessAdded }) => {
   const [formData, setFormData] = useState({
     name: '',
-    position: '',
-    bio: '',
-    pic: null,
+    description: '',
+    serviceAvailable: '',
+    phoneNumber: '',
+    emergencyNumber: '',
+    image: null,
     previewImage: null
   });
   const [loading, setLoading] = useState(false);
@@ -60,26 +63,28 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.name.trim() || !formData.position.trim()) {
-      Swal.fire('Error', 'Name and Position are required fields', 'error');
+    if (!formData.name.trim() || !formData.description.trim() || !formData.serviceAvailable.trim() || !formData.phoneNumber.trim() || !formData.emergencyNumber.trim()) {
+      Swal.fire('Error', 'Name, Description, Legal Awareness, Phone Number, and Emergency Number are required fields', 'error');
       return;
     }
     
     // Validate that an image is selected
-    if (!formData.pic) {
-      Swal.fire('Error', 'Please select an image for the team member', 'error');
+    if (!formData.image) {
+      Swal.fire('Error', 'Please select an image for the awareness item', 'error');
       return;
     }
     
     setLoading(true);
     const data = new FormData();
     data.append('name', formData.name.trim());
-    data.append('position', formData.position.trim());
-    data.append('bio', formData.bio.trim());
-    data.append('pic', formData.pic); // Always append pic since it's required
+    data.append('description', formData.description.trim());
+    data.append('serviceAvailable', formData.serviceAvailable.trim());
+    data.append('phoneNumber', formData.phoneNumber.trim());
+    data.append('emergencyNumber', formData.emergencyNumber.trim());
+    data.append('image', formData.image);
 
     try {
-      const response = await axios.post('http://localhost:8000/api/teams/addteams', data, {
+      const response = await axios.post('http://localhost:8000/api/awareness/addawareness', data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -87,31 +92,29 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
       
       Swal.fire({
         icon: 'success',
-        title: 'Team Member Added',
-        text: `${formData.name} has been added to the team.`
+        title: 'Awareness Item Added',
+        text: `${formData.name} has been added successfully.`
       });
       
       // Reset form and close modal
       setFormData({
         name: '',
-        position: '',
-        bio: '',
-        pic: '',
-        previewImage:''
+        description: '',
+        serviceAvailable: '',
+        phoneNumber: '',
+        emergencyNumber: '',
+        image: null,
+        previewImage: null
       });
       setShowModal(false);
       
-      // Notify parent component that a new member was added
-      if (onTeamAdded) {
-        onTeamAdded();
+      // Notify parent component that a new item was added
+      if (onAwarenessAdded) {
+        onAwarenessAdded();
       }
     } catch (error) {
-      console.error('Add team member error:', error);
-      console.error('Error response data:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      console.error('Error headers:', error.response?.headers);
-      
-      let errorMessage = 'An error occurred while adding the team member';
+      console.error('Add awareness error:', error);
+      let errorMessage = 'An error occurred while adding the awareness item';
       
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
@@ -123,7 +126,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
       
       Swal.fire({
         icon: 'error',
-        title: 'Failed to Add Team Member',
+        title: 'Failed to Add Awareness Item',
         text: errorMessage
       });
     } finally {
@@ -138,7 +141,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Add Team Member</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Add Awareness Item</h2>
             <button 
               onClick={() => setShowModal(false)}
               className="text-gray-400 hover:text-gray-700 text-2xl"
@@ -155,19 +158,19 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
                   <img 
                     src={formData.previewImage} 
                     alt="Preview" 
-                    className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                    className="w-32 h-32 rounded-lg object-cover border-4 border-green-100"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+                  <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-500">No image</span>
                   </div>
                 )}
               </div>
-              <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+              <label className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
                 <span>Upload Image *</span>
                 <input 
                   type="file" 
-                  name="pic"
+                  name="image"
                   accept="image/*"
                   onChange={handleChange}
                   required
@@ -187,37 +190,68 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's name"
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter awareness item name"
               />
             </div>
 
-            {/* Position Field */}
+            {/* Description Field */}
             <div className="flex flex-col">
-              <label htmlFor="position" className="text-sm font-medium text-gray-700 mb-1">Position*</label>
+              <label htmlFor="description" className="text-sm font-medium text-gray-700 mb-1">Description*</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="4"
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter awareness item description"
+              />
+            </div>
+
+            {/* Service Available Field */}
+            <div className="flex flex-col">
+              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Service Available*</label>
               <input
                 type="text"
-                id="position"
-                name="position"
-                value={formData.position}
+                id="serviceAvailable"
+                name="serviceAvailable"
+                value={formData.serviceAvailable}
                 onChange={handleChange}
                 required
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's position"
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter available services"
               />
             </div>
 
-            {/* Bio Field */}
+            {/* Phone Number Field */}
             <div className="flex flex-col">
-              <label htmlFor="bio" className="text-sm font-medium text-gray-700 mb-1">Bio</label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
+              <label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleChange}
-                rows="3"
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's bio"
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter phone number"
+              />
+            </div>
+
+            {/* Emergency Number Field */}
+            <div className="flex flex-col">
+              <label htmlFor="emergencyNumber" className="text-sm font-medium text-gray-700 mb-1">Emergency Number*</label>
+              <input
+                type="tel"
+                id="emergencyNumber"
+                name="emergencyNumber"
+                value={formData.emergencyNumber}
+                onChange={handleChange}
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter emergency number"
               />
             </div>
 
@@ -226,7 +260,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -236,7 +270,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faSave} className="mr-2" />
-                    Save Member
+                    Save Item
                   </>
                 )}
               </button>
@@ -248,28 +282,32 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
   );
 };
 
-// UpdateTeamModal component
-const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => {
+// UpdateAwarenessModal component
+const UpdateAwarenessModal = ({ showModal, setShowModal, item, onAwarenessUpdated }) => {
   const [formData, setFormData] = useState({
-    name: member?.name || '',
-    position: member?.position || '',
-    bio: member?.bio || '',
-    pic: member?.pic || null,
-    previewImage: member?.pic || null
+    name: item?.name || '',
+    description: item?.description || '',
+    serviceAvailable: item?.serviceAvailable || '',
+    phoneNumber: item?.phoneNumber || '',
+    emergencyNumber: item?.emergencyNumber || '',
+    image: null,
+    previewImage: item?.image || null
   });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (member) {
+    if (item) {
       setFormData({
-        name: member.name || '',
-        position: member.position || '',
-        bio: member.bio || '',
-        pic: null,
-        previewImage: member.pic || null // This should be the full URL from fetchTeam
+        name: item.name || '',
+        description: item.description || '',
+        serviceAvailable: item.serviceAvailable || '',
+        phoneNumber: item.phoneNumber || '',
+        emergencyNumber: item.emergencyNumber || '',
+        image: null,
+        previewImage: item.image || null
       });
     }
-  }, [member]);
+  }, [item]);
 
   const handleChange = (e) => {
     const { name, value, type, files } = e.target;
@@ -305,26 +343,22 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.name.trim() || !formData.position.trim()) {
-      Swal.fire('Error', 'Name and Position are required fields', 'error');
-      return;
-    }
-    
-    // Validate that an image is selected (either existing or new)
-    if (!formData.pic && !formData.previewImage) {
-      Swal.fire('Error', 'Please select an image for the team member', 'error');
+    if (!formData.name.trim() || !formData.description.trim() || !formData.serviceAvailable.trim() || !formData.phoneNumber.trim() || !formData.emergencyNumber.trim()) {
+      Swal.fire('Error', 'Name, Description, Service Available, Phone Number, and Emergency Number are required fields', 'error');
       return;
     }
     
     setLoading(true);
     const data = new FormData();
     data.append('name', formData.name.trim());
-    data.append('position', formData.position.trim());
-    data.append('bio', formData.bio.trim());
-    if (formData.pic) data.append('pic', formData.pic); // Only append if new image is selected
+    data.append('description', formData.description.trim());
+    data.append('serviceAvailable', formData.serviceAvailable.trim());
+    data.append('phoneNumber', formData.phoneNumber.trim());
+    data.append('emergencyNumber', formData.emergencyNumber.trim());
+    if (formData.image) data.append('image', formData.image);
 
     try {
-      const response = await axios.put(`http://localhost:8000/api/teams/updateteams/${member.id}`, data, {
+      const response = await axios.put(`http://localhost:8000/api/awareness/updateawareness/${item.id}`, data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -332,37 +366,37 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
       
       Swal.fire({
         icon: 'success',
-        title: 'Team Member Updated',
+        title: 'Awareness Item Updated',
         text: `${formData.name}'s information has been updated successfully.`
       });
       
       // Close modal
       setShowModal(false);
       
-      // Notify parent component that member was updated
-      if (onTeamUpdated) {
-        onTeamUpdated();
+      // Notify parent component that item was updated
+      if (onAwarenessUpdated) {
+        onAwarenessUpdated();
       }
     } catch (error) {
-      console.error('Update team member error:', error);
+      console.error('Update awareness error:', error);
       Swal.fire({
         icon: 'error',
-        title: 'Failed to Update Team Member',
-        text: error.response?.data?.message || 'An error occurred while updating the team member'
+        title: 'Failed to Update Awareness Item',
+        text: error.response?.data?.message || 'An error occurred while updating the awareness item'
       });
     } finally {
       setLoading(false);
     }
   };
 
-  if (!showModal || !member) return null;
+  if (!showModal || !item) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h2 className="text-2xl font-bold text-gray-800">Update Team Member</h2>
+            <h2 className="text-2xl font-bold text-gray-800">Update Awareness Item</h2>
             <button 
               onClick={() => setShowModal(false)}
               className="text-gray-400 hover:text-gray-700 text-2xl"
@@ -379,19 +413,19 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
                   <img 
                     src={formData.previewImage} 
                     alt="Preview" 
-                    className="w-32 h-32 rounded-full object-cover border-4 border-blue-100"
+                    className="w-32 h-32 rounded-lg object-cover border-4 border-green-100"
                   />
                 ) : (
-                  <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center">
+                  <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center">
                     <span className="text-gray-500">No image</span>
                   </div>
                 )}
               </div>
-              <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                <span>Change Image *</span>
+              <label className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                <span>Change Image</span>
                 <input 
                   type="file" 
-                  name="pic"
+                  name="image"
                   accept="image/*"
                   onChange={handleChange}
                   className="hidden"
@@ -410,37 +444,68 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's name"
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter awareness item name"
               />
             </div>
 
-            {/* Position Field */}
+            {/* Description Field */}
             <div className="flex flex-col">
-              <label htmlFor="position" className="text-sm font-medium text-gray-700 mb-1">Position*</label>
+              <label htmlFor="description" className="text-sm font-medium text-gray-700 mb-1">Description*</label>
+              <textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                rows="4"
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter awareness item description"
+              />
+            </div>
+
+            {/* Service Available Field */}
+            <div className="flex flex-col">
+              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Service Available*</label>
               <input
                 type="text"
-                id="position"
-                name="position"
-                value={formData.position}
+                id="serviceAvailable"
+                name="serviceAvailable"
+                value={formData.serviceAvailable}
                 onChange={handleChange}
                 required
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's position"
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter available services"
               />
             </div>
 
-            {/* Bio Field */}
+            {/* Phone Number Field */}
             <div className="flex flex-col">
-              <label htmlFor="bio" className="text-sm font-medium text-gray-700 mb-1">Bio</label>
-              <textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
+              <label htmlFor="phoneNumber" className="text-sm font-medium text-gray-700 mb-1">Phone Number*</label>
+              <input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleChange}
-                rows="3"
-                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's bio"
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter phone number"
+              />
+            </div>
+
+            {/* Emergency Number Field */}
+            <div className="flex flex-col">
+              <label htmlFor="emergencyNumber" className="text-sm font-medium text-gray-700 mb-1">Emergency Number*</label>
+              <input
+                type="tel"
+                id="emergencyNumber"
+                name="emergencyNumber"
+                value={formData.emergencyNumber}
+                onChange={handleChange}
+                required
+                className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
+                placeholder="Enter emergency number"
               />
             </div>
 
@@ -449,7 +514,7 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <>
@@ -459,7 +524,7 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
                 ) : (
                   <>
                     <FontAwesomeIcon icon={faSave} className="mr-2" />
-                    Update Member
+                    Update Item
                   </>
                 )}
               </button>
@@ -471,19 +536,19 @@ const UpdateTeamModal = ({ showModal, setShowModal, member, onTeamUpdated }) => 
   );
 };
 
-// TeamData component
-const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTeamData }) => {
+// AwarenessData component
+const AwarenessData = ({ awarenessData, currentPage, itemsPerPage, setAwarenessData, refreshAwarenessData }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const teamToDisplay = teamData.slice(startIndex, endIndex);
-  const [selectedMember, setSelectedMember] = useState(null);
+  const itemsToDisplay = awarenessData.slice(startIndex, endIndex);
+  const [selectedItem, setSelectedItem] = useState(null);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
 
-  const handleDelete = async (memberId) => {
+  const handleDelete = async (itemId) => {
     const result = await Swal.fire({
       icon: 'warning',
-      title: 'Delete Team Member?',
+      title: 'Delete Awareness Item?',
       text: 'This action cannot be undone!',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -494,51 +559,64 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`http://localhost:8000/api/teams/deleteteams/${memberId}`);
-        const updatedTeam = teamData.filter(member => member.id !== memberId);
-        setTeamData(updatedTeam);
-        Swal.fire('Deleted!', 'The team member has been deleted.', 'success');
+        await axios.delete(`http://localhost:8000/api/awareness/deleteawareness/${itemId}`);
+        const updatedItems = awarenessData.filter(item => item.id !== itemId);
+        setAwarenessData(updatedItems);
+        Swal.fire('Deleted!', 'The awareness item has been deleted.', 'success');
       } catch (error) {
-        Swal.fire('Error', 'Failed to delete team member', 'error');
+        Swal.fire('Error', 'Failed to delete awareness item', 'error');
         console.error('Delete error:', error);
       }
     }
   };
 
-  const handleView = async (memberId) => {
+  const handleToggleStatus = async (itemId) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/teams/getteams/${memberId}`);
-      setSelectedMember(response.data);
+      await axios.patch(`http://localhost:8000/api/awareness/toggleawareness/${itemId}`);
+      refreshAwarenessData();
+      Swal.fire('Success', 'Status updated successfully', 'success');
+    } catch (error) {
+      Swal.fire('Error', 'Failed to update status', 'error');
+      console.error('Toggle status error:', error);
+    }
+  };
+
+  const handleView = async (itemId) => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/awareness/getawareness/${itemId}`);
+      setSelectedItem(response.data.awareness);
       setShowViewModal(true);
     } catch (error) {
-      console.error('Error fetching member details:', error);
-      const member = teamData.find(m => m.id === memberId);
-      setSelectedMember(member);
+      console.error('Error fetching item details:', error);
+      const item = awarenessData.find(i => i.id === itemId);
+      setSelectedItem(item);
       setShowViewModal(true);
     }
   };
 
-  const handleEdit = async (memberId) => {
+  const handleEdit = async (itemId) => {
     try {
-      const response = await axios.get(`http://localhost:8000/api/teams/getteams/${memberId}`);
+      const response = await axios.get(`http://localhost:8000/api/awareness/getawareness/${itemId}`);
       
       // Transform the API response to match our expected format
-      const transformedMember = {
-        id: response.data._id || response.data.id,
-        name: response.data.name,
-        position: response.data.position,
-        bio: response.data.bio,
-        pic: response.data.pic 
-          ? (response.data.pic.startsWith('http') ? response.data.pic : `http://localhost:8000/uploads/${response.data.pic}`)
-          : 'https://randomuser.me/api/portraits/lego/1.jpg'
+      const transformedItem = {
+        id: response.data.awareness._id || response.data.awareness.id,
+        name: response.data.awareness.name,
+        description: response.data.awareness.description,
+        serviceAvailable: response.data.awareness.serviceAvailable || '',
+        phoneNumber: response.data.awareness.phoneNumber || '',
+        emergencyNumber: response.data.awareness.emergencyNumber || '',
+        image: response.data.awareness.image 
+          ? (response.data.awareness.image.startsWith('http') ? response.data.awareness.image : `http://localhost:8000/${response.data.awareness.image}`)
+          : 'https://via.placeholder.com/150'
       };
       
-      setSelectedMember(transformedMember);
+      setSelectedItem(transformedItem);
       setShowEditModal(true);
     } catch (error) {
-      console.error('Error fetching member details:', error);
-      const member = teamData.find(m => m.id === memberId);
-      setSelectedMember(member);
+      console.error('Error fetching item details:', error);
+      const item = awarenessData.find(i => i.id === itemId);
+      setSelectedItem(item);
       setShowEditModal(true);
     }
   };
@@ -549,49 +627,70 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Photo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Legal Awareness</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {teamToDisplay.map(member => (
-              <tr key={member.id} className="hover:bg-gray-50">
+            {itemsToDisplay.map(item => (
+              <tr key={item.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <img 
-                    src={member.pic} 
-                    alt={member.name} 
-                    className="h-10 w-10 rounded-full object-cover border"
+                    src={item.image} 
+                    alt={item.name} 
+                    className="h-12 w-12 rounded-lg object-cover border"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/default-profile.jpg';
+                      e.target.src = '/default-image.jpg';
                     }}
                   />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                  <div className="text-sm font-medium text-gray-900">{item.name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{member.position}</div>
+                  <div className="text-sm text-gray-500">
+                    {item.serviceAvailable || 'N/A'}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-500">
+                    {item.phoneNumber || 'N/A'}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <button
+                    onClick={() => handleToggleStatus(item.id)}
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      item.isActive 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {item.isActive ? 'Active' : 'Inactive'}
+                  </button>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <button 
-                    onClick={() => handleView(member.id)}
+                    onClick={() => handleView(item.id)}
                     className="text-blue-500 hover:text-blue-700 mx-2" 
                     title="View"
                   >
                     <FontAwesomeIcon icon={faEye} />
                   </button>
                   <button
-                    onClick={() => handleEdit(member.id)}
+                    onClick={() => handleEdit(item.id)}
                     className="text-yellow-500 hover:text-yellow-700 mx-2" 
                     title="Edit"
                   >
                     <FontAwesomeIcon icon={faPen} />
                   </button>
                   <button
-                    onClick={() => handleDelete(member.id)}
+                    onClick={() => handleDelete(item.id)}
                     className="text-red-500 hover:text-red-700 mx-2" 
                     title="Delete"
                   >
@@ -604,13 +703,13 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
         </table>
       </div>
 
-      {/* View Member Modal */}
-      {showViewModal && selectedMember && (
+      {/* View Item Modal */}
+      {showViewModal && selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">Team Member Details</h2>
+                <h2 className="text-2xl font-bold text-gray-800">Awareness Item Details</h2>
                 <button 
                   onClick={() => setShowViewModal(false)}
                   className="text-gray-400 hover:text-gray-700 text-2xl"
@@ -619,42 +718,57 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
                 </button>
               </div>
 
-              <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex flex-col gap-6">
                 <div className="flex-shrink-0">
                   <img
                     src={
-                      selectedMember.pic
-                        ? (selectedMember.pic.startsWith('http') ? selectedMember.pic : `http://localhost:8000/${selectedMember.pic}`)
-                        : '/default-profile.jpg'
+                      selectedItem.image
+                        ? (selectedItem.image.startsWith('http') ? selectedItem.image : `http://localhost:8000/${selectedItem.image}`)
+                        : '/default-image.jpg'
                     }
-                    alt={selectedMember.name}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-blue-100 mx-auto"
+                    alt={selectedItem.name}
+                    className="w-full h-48 rounded-lg object-cover border-4 border-green-100"
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = '/default-profile.jpg';
+                      e.target.src = '/default-image.jpg';
                     }}
                   />
                 </div>
 
                 <div className="flex-grow">
                   <div className="mb-6">
-                    <h3 className="text-xl font-semibold text-gray-800">{selectedMember.name}</h3>
-                    <p className="text-blue-600 font-medium">{selectedMember.position}</p>
+                    <h3 className="text-xl font-semibold text-gray-800">{selectedItem.name}</h3>
+                    <p className="text-green-600 font-medium">
+                      {selectedItem.isActive ? 'Active' : 'Inactive'}
+                    </p>
                   </div>
 
-                  {selectedMember.bio && (
-                    <div className="mt-6">
-                      <h4 className="text-lg font-medium text-gray-800 mb-2">Bio</h4>
-                      <p className="text-gray-600 whitespace-pre-line">{selectedMember.bio}</p>
-                    </div>
-                  )}
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">Description</h4>
+                    <p className="text-gray-600 whitespace-pre-line">{selectedItem.description}</p>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">Service Available</h4>
+                    <p className="text-gray-600">{selectedItem.serviceAvailable}</p>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">Phone Number</h4>
+                    <p className="text-gray-600">{selectedItem.phoneNumber}</p>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">Emergency Number</h4>
+                    <p className="text-gray-600">{selectedItem.emergencyNumber}</p>
+                  </div>
                 </div>
               </div>
 
               <div className="mt-6 flex justify-end">
                 <button
                   onClick={() => setShowViewModal(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                 >
                   Close
                 </button>
@@ -664,23 +778,23 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
         </div>
       )}
 
-      {/* Edit Member Modal */}
-      {showEditModal && selectedMember && (
-        <UpdateTeamModal 
+      {/* Edit Item Modal */}
+      {showEditModal && selectedItem && (
+        <UpdateAwarenessModal 
           showModal={showEditModal}
           setShowModal={setShowEditModal}
-          member={selectedMember}
-          onTeamUpdated={refreshTeamData}
+          item={selectedItem}
+          onAwarenessUpdated={refreshAwarenessData}
         />
       )}
     </>
   );
 };
 
-// Main Team component
-const Team = () => {
+// Main Awareness component
+const Awareness = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [teamData, setTeamData] = useState([]);
+  const [awarenessData, setAwarenessData] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -688,59 +802,62 @@ const Team = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const itemsPerPage = 10;
 
-  const fetchTeam = async () => {
+  const fetchAwareness = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await axios.get('http://localhost:8000/api/teams/getallteams');
-      const teamArray = Array.isArray(response.data) ? response.data : response.data.team;
+      const response = await axios.get('http://localhost:8000/api/awareness/getallawareness');
+      const awarenessArray = response.data.awareness || [];
       
-      if (!Array.isArray(teamArray)) throw new Error('No team data received');
+      if (!Array.isArray(awarenessArray)) throw new Error('No awareness data received');
 
-      const transformedData = teamArray.map(member => ({
-        id: member._id,
-        name: member.name,
-        position: member.position,
-        pic: member.pic 
-          ? (member.pic.startsWith('http') ? member.pic : `http://localhost:8000/${member.pic}`)
-          : 'https://randomuser.me/api/portraits/lego/1.jpg',
-        bio: member.bio,
-        createdAt: member.createdAt || new Date().toISOString()
+      const transformedData = awarenessArray.map(item => ({
+        id: item._id,
+        name: item.name,
+        description: item.description,
+        serviceAvailable: item.serviceAvailable || '',
+        phoneNumber: item.phoneNumber || '',
+        emergencyNumber: item.emergencyNumber || '',
+        image: item.image 
+          ? (item.image.startsWith('http') ? item.image : `http://localhost:8000/${item.image}`)
+          : 'https://via.placeholder.com/150',
+        isActive: item.isActive,
+        createdAt: item.createdAt || new Date().toISOString()
       }));
 
-      setTeamData(transformedData);
+      setAwarenessData(transformedData);
     } catch (err) {
-      console.error('Fetch team error:', err);
-      setError(err.message || 'Failed to load team members');
+      console.error('Fetch awareness error:', err);
+      setError(err.message || 'Failed to load awareness items');
       
       // Fallback to mock data if API fails
-      const mockTeam = [
+      const mockAwareness = [
         {
           id: 1,
-          name: 'Alice Johnson',
-          position: 'Project Manager',
-          pic: 'https://randomuser.me/api/portraits/women/44.jpg',
-          bio: 'Alice is an experienced project manager with a passion for agile methodologies.',
+          name: 'Women Empowerment Campaign',
+          description: 'Raising awareness about women empowerment and gender equality.',
+          image: 'https://via.placeholder.com/150',
+          isActive: true,
           createdAt: '2023-01-15T10:00:00Z'
         },
         {
           id: 2,
-          name: 'Bob Smith',
-          position: 'Lead Developer',
-          pic: 'https://randomuser.me/api/portraits/men/32.jpg',
-          bio: 'Bob specializes in full-stack development and loves working with React and Node.js.',
+          name: 'Education for All',
+          description: 'Promoting education opportunities for women and girls.',
+          image: 'https://via.placeholder.com/150',
+          isActive: true,
           createdAt: '2023-02-20T10:00:00Z'
         },
       ];
-      setTeamData(mockTeam);
+      setAwarenessData(mockAwareness);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTeam();
+    fetchAwareness();
   }, []);
 
   const handleSearch = (e) => {
@@ -756,8 +873,8 @@ const Team = () => {
     setSortOption(e.target.value);
   };
 
-  const sortTeam = (team) => {
-    const sorted = [...team];
+  const sortAwareness = (items) => {
+    const sorted = [...items];
     switch (sortOption) {
       case "newest":
         return sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -772,30 +889,29 @@ const Team = () => {
     }
   };
 
-  const filteredTeam = teamData.filter(member =>
-    member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.position?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAwareness = awarenessData.filter(item =>
+    item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const sortedAndFilteredTeam = sortTeam(filteredTeam);
-  const totalPages = Math.ceil(sortedAndFilteredTeam.length / itemsPerPage);
+  const sortedAndFilteredAwareness = sortAwareness(filteredAwareness);
+  const totalPages = Math.ceil(sortedAndFilteredAwareness.length / itemsPerPage);
 
-  const handleTeamAdded = (newMember) => {
-    fetchTeam(); // refresh the list
-    setSearchQuery(newMember.name); // set search to new member's name
+  const handleAwarenessAdded = () => {
+    fetchAwareness(); // refresh the list
   };
 
   return (
     <AdminLayout>
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-          <h1 className="text-2xl font-bold text-gray-800">Team Management</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Awareness Management</h1>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center transition-colors"
           >
             <FontAwesomeIcon icon={faPlus} className="mr-2" />
-            Add Team Member
+            Add Awareness Item
           </button>
         </div>
 
@@ -808,10 +924,10 @@ const Team = () => {
               </div>
               <input
                 type="text"
-                placeholder="Search team members..."
+                placeholder="Search awareness items..."
                 value={searchQuery}
                 onChange={handleSearch}
-                className="pl-10 pr-10 py-2 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                className="pl-10 pr-10 py-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
               />
               {searchQuery && (
                 <button
@@ -826,7 +942,7 @@ const Team = () => {
             <select
               value={sortOption}
               onChange={handleSortChange}
-              className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+              className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -839,7 +955,7 @@ const Team = () => {
         {/* Content */}
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <FontAwesomeIcon icon={faSpinner} spin size="2x" className="text-blue-500" />
+            <FontAwesomeIcon icon={faSpinner} spin size="2x" className="text-green-500" />
           </div>
         ) : error ? (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -856,7 +972,7 @@ const Team = () => {
               Retry
             </button>
           </div>
-        ) : sortedAndFilteredTeam.length === 0 ? (
+        ) : sortedAndFilteredAwareness.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
             <div className="text-gray-400 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -864,28 +980,28 @@ const Team = () => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-700 mb-1">
-              {searchQuery ? 'No matching team members found' : 'No team members available'}
+              {searchQuery ? 'No matching awareness items found' : 'No awareness items available'}
             </h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery ? 'Try a different search term' : 'Add your first team member to get started'}
+              {searchQuery ? 'Try a different search term' : 'Add your first awareness item to get started'}
             </p>
             {!searchQuery && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm"
+                className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm"
               >
-                Add Team Member
+                Add Awareness Item
               </button>
             )}
           </div>
         ) : (
           <>
-            <TeamData
-              teamData={sortedAndFilteredTeam}
+            <AwarenessData
+              awarenessData={sortedAndFilteredAwareness}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
-              setTeamData={setTeamData}
-              refreshTeamData={fetchTeam}
+              setAwarenessData={setAwarenessData}
+              refreshAwarenessData={fetchAwareness}
             />
 
             {/* Pagination */}
@@ -904,7 +1020,7 @@ const Team = () => {
                     <button
                       key={page}
                       onClick={() => setCurrentPage(page)}
-                      className={`px-3 py-1 border rounded-md ${currentPage === page ? 'bg-blue-500 text-white border-blue-500' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                      className={`px-3 py-1 border rounded-md ${currentPage === page ? 'bg-green-500 text-white border-green-500' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
                     >
                       {page}
                     </button>
@@ -924,14 +1040,14 @@ const Team = () => {
         )}
       </div>
 
-      {/* Add Team Member Modal */}
-      <AddTeamModal 
+      {/* Add Awareness Item Modal */}
+      <AddAwarenessModal 
         showModal={showAddModal}
         setShowModal={setShowAddModal}
-        onTeamAdded={handleTeamAdded}
+        onAwarenessAdded={handleAwarenessAdded}
       />
     </AdminLayout>
   );
 };
 
-export default Team;
+export default Awareness; 
