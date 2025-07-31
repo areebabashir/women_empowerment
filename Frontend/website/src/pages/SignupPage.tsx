@@ -151,6 +151,13 @@ const SignUpPage = () => {
     //   newErrors.documents = "Documents are required for NGO registration";
     //   isValid = false;
     // }
+    if (formData.role === 'ngo') {
+      if (documents.length === 0) {
+        newErrors.documents = "Documents are required for NGO registration";
+        isValid = false;
+      }
+    }
+
 
     setErrors(newErrors);
     return isValid;

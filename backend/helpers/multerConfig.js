@@ -1,9 +1,17 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
 // Define allowed extensions for images and documents
 const allowedImageTypes = /jpeg|jpg|png|gif/;
 const allowedDocTypes = /pdf|doc|docx/;
+
+// Ensure directories exist
+const ensureDirectoryExists = (dirPath) => {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true });
+  }
+};
 
 // Storage configuration
 const storage = multer.diskStorage({
@@ -44,6 +52,27 @@ function fileFilter(req, file, cb) {
   }
 }
 
+// Function to copy file to company_ngo folder if user is a company
+const copyToCompanyFolder = (filePath, filename) => {
+  return new Promise((resolve, reject) => {
+    const companyNgoDir = 'uploads/company_ngo';
+    ensureDirectoryExists(companyNgoDir);
+    
+    const sourcePath = filePath;
+    const destPath = path.join(companyNgoDir, filename);
+    
+    fs.copyFile(sourcePath, destPath, (err) => {
+      if (err) {
+        console.error('Error copying file to company_ngo folder:', err);
+        reject(err);
+      } else {
+        console.log(`File copied to company_ngo folder: ${destPath}`);
+        resolve(destPath);
+      }
+    });
+  });
+};
+
 const upload = multer({ 
   storage, 
   fileFilter,
@@ -55,5 +84,6 @@ const upload = multer({
 // Export specific middlewares
 export const uploadReceipt = upload.single('receipt');
 export const uploadMultiple = upload.fields([{ name: 'documents', maxCount: 5 }]);
+export { copyToCompanyFolder };
 
 export default upload;

@@ -71,12 +71,20 @@ export const registerUser = async (req, res) => {
     res.status(500).json({ msg: 'Server error', error: error.message });
   }
 };
+import { copyToCompanyFolder } from '../helpers/multerConfig.js';
+import path from 'path';
 
 export const updateUser = async (req, res) => {
   try {
     const {userId} = req.body;
     const { name, address, phone, role } = req.body;
     console.log(req.body)
+
+    // Get current user to check role
+    const currentUser = await User.findById(userId);
+    if (!currentUser) {
+      return res.status(404).json({ msg: 'User not found' });
+    }
 
     // Prepare update data
     const updatedData = {};
@@ -88,7 +96,21 @@ export const updateUser = async (req, res) => {
     
     // If image is uploaded
     if (req.files && req.files['image'] && req.files['image'][0]) {
-      updatedData.image = `uploads/images/${req.files['image'][0].filename}`;
+      const imageFile = req.files['image'][0];
+      updatedData.image = `uploads/images/${imageFile.filename}`;
+      
+      // If user is a company or NGO, also copy to company_ngo folder
+      if (currentUser.role === 'company' || currentUser.role === 'ngo' || 
+          (role && (role === 'company' || role === 'ngo'))) {
+        try {
+          const sourceImagePath = path.join('uploads/images', imageFile.filename);
+          await copyToCompanyFolder(sourceImagePath, imageFile.filename);
+          console.log(`Image copied to company_ngo folder for ${currentUser.role || role} user`);
+        } catch (copyError) {
+          console.error('Failed to copy image to company_ngo folder:', copyError);
+          // Continue execution even if copy fails
+        }
+      }
     }
 
     // If documents are uploaded (for NGO users)
@@ -123,7 +145,6 @@ export const updateUser = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
-
 
 // Login
 export const loginUser = async (req, res) => {

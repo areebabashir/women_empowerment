@@ -14,6 +14,7 @@ function SideBar() {
 
     { to: "/Admin/SuccessStories", icon: faStar, label: "Success Stories" },
     { to: "/Admin/Gallery", icon: faImages, label: "Gallery" },
+    { to: "/Admin/Donations", icon: faImages, label: "Donation" },
     { to: "/Admin/Podcast", icon: faPodcast, label: "Podcast" },
     { to: "/Admin/Users", icon: faUser, label: "Users" },
     { to: "/Admin/contact", icon: faEnvelope, label: "Contact" },
