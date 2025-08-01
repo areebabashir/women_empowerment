@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { isAuthenticated } from "@/utils/auth";
+
 import {
   GraduationCap,
   Heart,
@@ -28,7 +29,7 @@ import heroImage from "@/assets/hero-empowered-women.jpg";
 import supportImage from "@/assets/women-supporting-each-other.jpg";
 import successStoryImage from "@/assets/success-story-woman.jpg";
 import { useEffect, useState } from "react";
-import { getAllSuccessStories } from "@/services/api";
+import { getAllSuccessStories ,getAllAwareness } from "@/services/api";
 import { apiCall } from "@/api/apiCall";
 import toast from "react-hot-toast";
 import { getImageUrl } from "@/utils/imageUtils";
@@ -38,6 +39,9 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
 
 const Index = () => {
   const [partnerLogos, setPartnerLogos] = useState<string[]>([]);
+  const [awarenessData, setawarenessData] = useState([]);
+  const [errorAwareness, setErrorAwareness] = useState(null);
+  const [loadingAwareness, setLoadingAwareness] = useState(true);
 
 
   useEffect(() => {
@@ -381,62 +385,62 @@ const Index = () => {
   // Convert API data to frontend format
   const awarenessCards = awarenessData.map(convertAwarenessToFrontendFormat);
 
-const partnerLogos = [
-  {
-    name: "Women's Foundation",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <rect width="100" height="40" rx="5" fill="#8b5cf6" />
-        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
-      </svg>
-    )
-  },
-  {
-    name: "Global Empowerment",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <circle cx="20" cy="20" r="15" fill="#ec4899" />
-        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
-      </svg>
-    )
-  },
-  {
-    name: "Equal Rights Initiative",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
-      </svg>
-    )
-  },
-  {
-    name: "Education First",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <polygon points="50,0 100,40 0,40" fill="#10b981" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
-      </svg>
-    )
-  },
-  {
-    name: "Health & Wellness",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
-      </svg>
-    )
-  },
-  {
-    name: "Future Leaders",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
-      </svg>
-    )
-  }
-];
+// const partnerLogos = [
+//   {
+//     name: "Women's Foundation",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <rect width="100" height="40" rx="5" fill="#8b5cf6" />
+//         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Global Empowerment",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <circle cx="20" cy="20" r="15" fill="#ec4899" />
+//         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Equal Rights Initiative",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Education First",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <polygon points="50,0 100,40 0,40" fill="#10b981" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Health & Wellness",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Future Leaders",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
+//       </svg>
+//     )
+//   }
+// ];
   const programs = [
     {
       icon: <GraduationCap className="w-8 h-8" />,
