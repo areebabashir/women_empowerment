@@ -127,3 +127,33 @@ export async function submitContactForm(contactData) {
     throw error;
   }
 } 
+
+// Function to fetch all awareness items
+export async function getAllAwareness() {
+  try {
+    const response = await fetch('http://localhost:8000/api/awareness/getallawareness');
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching awareness:', error);
+    throw error;
+  }
+}
+
+// Function to fetch awareness item by ID
+export async function getAwarenessById(id) {
+  try {
+    const response = await fetch(`http://localhost:8000/api/awareness/getawareness/${id}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching awareness by ID:', error);
+    throw error;
+  }
+} 

@@ -1,13 +1,13 @@
 import express from 'express';
-import { 
-  getAllAwareness, 
-  getAwarenessById, 
-  addAwareness, 
-  updateAwareness, 
+import {
+  getAllAwareness,
+  getAwarenessById,
+  addAwareness,
+  updateAwareness,
   deleteAwareness,
-  toggleAwarenessStatus 
+  toggleAwarenessStatus
 } from '../controllers/awarenessController.js';
-import upload from '../helpers/multerConfig.js';
+
 
 const router = express.Router();
 
@@ -17,11 +17,11 @@ router.get('/getallawareness', getAllAwareness);
 // Get awareness item by ID
 router.get('/getawareness/:id', getAwarenessById);
 
-// Add a new awareness item (with image upload)
-router.post('/addawareness', upload.single('image'), addAwareness);
+// Add a new awareness item
+router.post('/addawareness', addAwareness);
 
-// Update an awareness item (with optional image upload)
-router.put('/updateawareness/:id', upload.single('image'), updateAwareness);
+// Update an awareness item
+router.put('/updateawareness/:id', updateAwareness);
 
 // Delete an awareness item
 router.delete('/deleteawareness/:id', deleteAwareness);
