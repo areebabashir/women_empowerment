@@ -180,17 +180,18 @@ const Index = () => {
       'FileText': <FileText className="w-8 h-8" />
     };
 
-         return {
-       id: awarenessItem._id,
-       title: awarenessItem.title || awarenessItem.name,
-       name: awarenessItem.name,
-       phone: awarenessItem.phoneNumber,
-       description: awarenessItem.description,
-       image: awarenessItem.image,
-       services: awarenessItem.services || [],
-       icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
-       color: awarenessItem.color || "from-blue-500 to-teal-600"
-     };
+    return {
+      id: awarenessItem._id,
+      title: awarenessItem.title || awarenessItem.name,
+      name: awarenessItem.name,
+      phone: awarenessItem.phoneNumber,
+      emergency: awarenessItem.emergencyNumber,
+      description: awarenessItem.description,
+      image: awarenessItem.image,
+      services: awarenessItem.services || [],
+      icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
+      color: awarenessItem.color || "from-blue-500 to-teal-600"
+    };
   };
 
   // Convert API data to frontend format
@@ -541,26 +542,20 @@ const partnerLogos = [
   </div>
 </section>
 
-        {/* Awareness - Infinite Moving Carousel */}
-<section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
-  <div className="container mx-auto px-4">
-    <div className="text-center mb-16">
-      <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-6 shadow-2xl">
-        <AlertTriangle className="w-10 h-10 text-white" />
-      </div>
-      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-                    Awareness & Emergency Support
-      </h2>
-      <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-        Know your rights, get help when you need it.
-      </p>
-      <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
-        <p className="text-red-800 dark:text-red-200 font-semibold flex items-center justify-center gap-2">
-          <PhoneCall className="w-5 h-5" />
-          In case of immediate danger, always call 911 first
-        </p>
-      </div>
-    </div>
+      {/* Legal Awareness - Infinite Moving Carousel */}
+      <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r  from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
+              <AlertTriangle className="w-10 h-10 text-white" />
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+              Legal Awareness
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Know your rights, get help when you need it.
+            </p>
+          </div>
 
          {loadingAwareness ? (
        <div className="text-center py-10">Loading awareness resources...</div>
@@ -584,12 +579,16 @@ const partnerLogos = [
                  <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
                  <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
                  
-                                   <div className="flex flex-col gap-2 mb-4">
-                    <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                      <Phone className="w-4 h-4" />
-                      <span className="font-mono font-bold">{card.phone}</span>
-                    </div>
-                  </div>
+                 <div className="flex flex-col gap-2 mb-4">
+                   <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                     <Phone className="w-4 h-4" />
+                     <span className="font-mono font-bold">{card.phone}</span>
+                   </div>
+                   <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                     <AlertTriangle className="w-4 h-4" />
+                     <span className="font-mono font-bold">{card.emergency}</span>
+                   </div>
+                 </div>
 
                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
                    {card.description}
@@ -737,13 +736,22 @@ const partnerLogos = [
                   <AlertTriangle className="w-6 h-6" />
                   Emergency Contacts
                 </h4>
-                                 <div className="flex items-center gap-3">
-                   <Phone className="w-5 h-5 text-green-600" />
-                   <div>
-                     <p className="font-semibold text-gray-700">Main Hotline</p>
-                     <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
-                   </div>
-                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3">
+                    <Phone className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="font-semibold text-gray-700">Main Hotline</p>
+                      <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                    <div>
+                      <p className="font-semibold text-gray-700">Emergency</p>
+                      <p className="font-mono text-lg text-red-700">{activeLegalInfo.emergency}</p>
+                    </div>
+                  </div>
+                </div>
                 <div className="mt-4 flex gap-3">
                   <Button 
                     className="bg-green-600 hover:bg-green-700 text-white"
