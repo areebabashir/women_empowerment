@@ -12,10 +12,20 @@ import contactUsRoute from './routes/contactUsRoute.js';
 import galleryRoute from './routes/galleryRoute.js';
 import podcastRoute from './routes/podcastRoute.js';
 import donationRoute from "./routes/donationRoute.js"
+<<<<<<< HEAD
+import awarenessRoute from './routes/awarenessRoute.js';
+import fs from 'fs';
+=======
 import awarenessRoute from "./routes/awarenessRoute.js"
 
 import path from 'path';
+>>>>>>> af0d7a3a2d05ac0d02faa114d8bdd1aaa8682c27
 
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables
 dotenv.config();
@@ -47,6 +57,23 @@ app.use('/api/gallery', galleryRoute);
 app.use('/api/podcasts', podcastRoute);
 app.use('/api/donations' , donationRoute);
 app.use('/api/awareness', awarenessRoute);
+app.get('/api/partner-logos', (req, res) => {
+  console.log("req hittt")
+  const folderPath = path.join(__dirname, 'uploads', 'company_ngo');
+
+
+  fs.readdir(folderPath, (err, files) => {
+    if (err) {
+      console.error('Error reading directory:', err);
+      return res.status(500).json({ msg: 'Unable to read logos directory' });
+    }
+
+    const imageUrls = files.map(file => `/uploads/company_ngo/${file}`);
+    console.log(imageUrls)
+    res.json(imageUrls);
+  });
+});
+
 
 // Set the PORT from environment variables or default to 8000
 const PORT = process.env.PORT || 8000;

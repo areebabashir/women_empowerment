@@ -209,11 +209,22 @@ export const deleteProgram = async (req, res) => {
 export const addParticipant = async (req, res) => {
   try {
     const { programId } = req.params;
-    const {userId} = req.body
+    const { userId } = req.body;
 
     const program = await Program.findById(programId);
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    // Fetch user and check role
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const role = user.role?.toLowerCase();
+    if (role === 'company' || role === 'ngo') {
+      return res.status(403).json({ success: false, message: 'Companies and NGOs cannot register as participants' });
     }
 
     // Check if user already joined

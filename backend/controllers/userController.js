@@ -60,17 +60,17 @@ export const registerUser = async (req, res) => {
       console.log('Documents added:', userData.documents);
       
       // If user is NGO, copy documents to company_ngo folder
-      if (role === 'ngo') {
-        try {
-          const copyPromises = req.files['documents'].map(file => 
-            copyToCompanyFolder(file.path, file.filename)
-          );
-          await Promise.all(copyPromises);
-        } catch (copyError) {
-          console.error('Error copying files to company_ngo folder:', copyError);
-          // Don't fail registration if copy fails, just log the error
-        }
-      }
+      // if (role === 'ngo') {
+      //   try {
+      //     const copyPromises = req.files['documents'].map(file => 
+      //       copyToCompanyFolder(file.path, file.filename)
+      //     );
+      //     await Promise.all(copyPromises);
+      //   } catch (copyError) {
+      //     console.error('Error copying files to company_ngo folder:', copyError);
+      //     // Don't fail registration if copy fails, just log the error
+      //   }
+      // }
     }
 
     console.log('Final user data:', userData);

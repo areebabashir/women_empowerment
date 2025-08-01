@@ -129,3 +129,19 @@ All colors MUST be HSL.
     animation: none;
   }
 }
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); } /* Half the width since we doubled the content */
+}
+
+.animate-scroll-slow {
+  animation: scroll 40s linear infinite; /* Adjust time as needed */
+  width: max-content;
+}
+
+@media (prefers-reduced-motion) {
+  .animate-scroll-slow {
+    animation: none;
+  }
+}

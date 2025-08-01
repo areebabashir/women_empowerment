@@ -1,4 +1,9 @@
 // src/utils/auth.ts
+import { apiCall } from "@/api/apiCall";
+import { User } from "@/types";
+
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 interface TokenData {
   exp: number;
@@ -44,11 +49,30 @@ export const setAuth = (token: string, role: string): void => {
   localStorage.setItem('userRole', role);
 };
 
+export const isngoorCompany = async (): Promise<boolean> => {
+  try {
+    const response = await apiCall<{ user: User }>({
+      url: `${API_BASE_URL}/users/profile`,
+      method: 'GET',
+      requiresAuth: true,
+    });
+
+    const role = response?.data?.role?.toLowerCase();
+
+    console.log("roleee" , role)
+    return role === 'ngo' || role === 'company';
+  } catch (error) {
+    console.error('Error checking role:', error);
+    return false;
+  }
+};
+
 // You can still keep the authUtils object if you want both approaches
 export const authUtils = {
   isAuthenticated,
   getUserRole,
   getToken,
   logout,
-  setAuth
+  setAuth,
+  isngoorCompany
 };

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { isAuthenticated } from "@/utils/auth";
+
 import {
   GraduationCap,
   Heart,
@@ -27,12 +28,97 @@ import "keen-slider/keen-slider.min.css";
 import heroImage from "@/assets/hero-empowered-women.jpg";
 import supportImage from "@/assets/women-supporting-each-other.jpg";
 import successStoryImage from "@/assets/success-story-woman.jpg";
-import { useEffect, useState, Fragment } from "react";
-import { getAllSuccessStories, getAllAwareness } from "@/services/api";
+import { useEffect, useState } from "react";
+import { getAllSuccessStories ,getAllAwareness } from "@/services/api";
+import { apiCall } from "@/api/apiCall";
 import toast from "react-hot-toast";
 import { getImageUrl } from "@/utils/imageUtils";
 
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
 const Index = () => {
+  const [partnerLogos, setPartnerLogos] = useState<string[]>([]);
+  const [awarenessData, setawarenessData] = useState([]);
+  const [errorAwareness, setErrorAwareness] = useState(null);
+  const [loadingAwareness, setLoadingAwareness] = useState(true);
+
+
+  useEffect(() => {
+    const fetchLogos = async () => {
+      const response = await apiCall<string[]>({
+        url: `${API_BASE_URL}/partner-logos`,
+        method: 'GET',
+      });
+
+      if (response.success) {
+        console.log(partnerLogos)
+        setPartnerLogos(response.data);
+      } else {
+        console.error('Failed to fetch partner logos:', response.data);
+      }
+    };
+
+    fetchLogos();
+  }, []);
+
+
+  // const partnerLogos = [
+  //   {
+  //     name: "Women's Foundation",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <rect width="100" height="40" rx="5" fill="#8b5cf6" />
+  //         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
+  //       </svg>
+  //     )
+  //   },
+  //   {
+  //     name: "Global Empowerment",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <circle cx="20" cy="20" r="15" fill="#ec4899" />
+  //         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
+  //       </svg>
+  //     )
+  //   },
+  //   {
+  //     name: "Equal Rights Initiative",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
+  //         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
+  //       </svg>
+  //     )
+  //   },
+  //   {
+  //     name: "Education First",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <polygon points="50,0 100,40 0,40" fill="#10b981" />
+  //         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
+  //       </svg>
+  //     )
+  //   },
+  //   {
+  //     name: "Health & Wellness",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
+  //         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
+  //       </svg>
+  //     )
+  //   },
+  //   {
+  //     name: "Future Leaders",
+  //     component: (
+  //       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+  //         <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
+  //         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
+  //       </svg>
+  //     )
+  //   }
+  // ];
   const [impactCounts, setImpactCounts] = useState({
     women: 0,
     villages: 0,
@@ -46,7 +132,7 @@ const Index = () => {
     programs: 25,
     countries: 8
   };
-// Keen Slider configuration for Success Stories
+  // Keen Slider configuration for Success Stories
   const [storySliderRef] = useKeenSlider({
     loop: true,
     slides: {
@@ -94,14 +180,115 @@ const Index = () => {
   const [activeStory, setActiveStory] = useState(null);
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [activeLegalInfo, setActiveLegalInfo] = useState(null);
-  const [awarenessData, setAwarenessData] = useState([]);
-  const [loadingAwareness, setLoadingAwareness] = useState(true);
-  const [errorAwareness, setErrorAwareness] = useState(null);
 
-  // Awareness Data will be loaded from API
+  // Legal Awareness Data
+  const legalAwarenessCards = [
+    {
+      id: 1,
+      title: "Domestic Violence Helpline",
+      name: "National Domestic Violence Hotline",
+      phone: "1-800-799-7233",
+      emergency: "911",
+      description: "24/7 confidential support for victims of domestic violence. Trained advocates provide crisis intervention, safety planning, and referrals to local resources.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Crisis intervention and emotional support",
+        "Safety planning assistance", 
+        "Local shelter and resource referrals",
+        "Legal advocacy information"
+      ],
+      icon: <Heart className="w-8 h-8" />,
+      color: "from-red-500 to-pink-600"
+    },
+    {
+      id: 2,
+      title: "Sexual Assault Support",
+      name: "RAINN National Sexual Assault Hotline",
+      phone: "1-800-656-4673",
+      emergency: "911",
+      description: "Free, confidential support for survivors of sexual assault. Connects you with trained staff from local sexual assault service providers.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "24/7 crisis counseling",
+        "Medical and legal advocacy",
+        "Support group referrals",
+        "Online chat support available"
+      ],
+      icon: <Shield className="w-8 h-8" />,
+      color: "from-purple-500 to-indigo-600"
+    },
+    {
+      id: 3,
+      title: "Legal Aid Services",
+      name: "Women's Law Center",
+      phone: "1-800-HELP-LAW",
+      emergency: "For emergencies call 911",
+      description: "Free legal assistance for women facing discrimination, family law issues, and workplace harassment. Know your rights and get help.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Family law and divorce assistance",
+        "Employment discrimination cases",
+        "Housing rights advocacy",
+        "Immigration law support"
+      ],
+      icon: <Scale className="w-8 h-8" />,
+      color: "from-blue-500 to-teal-600"
+    },
+    {
+      id: 4,
+      title: "Mental Health Crisis",
+      name: "Crisis Text Line",
+      phone: "Text HOME to 741741",
+      emergency: "988 - Suicide Prevention",
+      description: "Free, 24/7 mental health support via text message. Trained crisis counselors provide immediate emotional support.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Text-based crisis counseling",
+        "Suicide prevention support",
+        "Mental health resource referrals",
+        "Anonymous and confidential"
+      ],
+      icon: <Heart className="w-8 h-8" />,
+      color: "from-green-500 to-emerald-600"
+    },
+    {
+      id: 5,
+      title: "Workplace Rights",
+      name: "Equal Employment Opportunity Commission",
+      phone: "1-800-669-4000",
+      emergency: "Document incidents immediately",
+      description: "Report workplace discrimination, harassment, and violations of your employment rights. Free consultation and investigation services.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Sexual harassment reporting",
+        "Wage discrimination claims",
+        "Pregnancy discrimination support",
+        "Workplace accommodation requests"
+      ],
+      icon: <Building className="w-8 h-8" />,
+      color: "from-orange-500 to-red-600"
+    },
+    {
+      id: 6,
+      title: "Housing Assistance",
+      name: "National Housing Law Project",
+      phone: "1-800-HOUSING",
+      emergency: "Contact local police for illegal evictions",
+      description: "Legal assistance for housing discrimination, tenant rights, and preventing homelessness. Protecting your right to safe housing.",
+      image: "/api/placeholder/300/200",
+      services: [
+        "Tenant rights education",
+        "Housing discrimination cases",
+        "Eviction prevention assistance",
+        "Accessible housing advocacy"
+      ],
+      icon: <MapPin className="w-8 h-8" />,
+      color: "from-indigo-500 to-purple-600"
+    }
+  ];
 
   useEffect(() => {
-    scrollTo(0,0)
+    scrollTo(0, 0)
   }, []);
 
   useEffect(() => {
@@ -150,6 +337,7 @@ const Index = () => {
     fetchStories();
   }, [toast]);
 
+
   useEffect(() => {
     async function fetchAwareness() {
       try {
@@ -197,62 +385,62 @@ const Index = () => {
   // Convert API data to frontend format
   const awarenessCards = awarenessData.map(convertAwarenessToFrontendFormat);
 
-const partnerLogos = [
-  {
-    name: "Women's Foundation",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <rect width="100" height="40" rx="5" fill="#8b5cf6" />
-        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
-      </svg>
-    )
-  },
-  {
-    name: "Global Empowerment",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <circle cx="20" cy="20" r="15" fill="#ec4899" />
-        <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
-      </svg>
-    )
-  },
-  {
-    name: "Equal Rights Initiative",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
-      </svg>
-    )
-  },
-  {
-    name: "Education First",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <polygon points="50,0 100,40 0,40" fill="#10b981" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
-      </svg>
-    )
-  },
-  {
-    name: "Health & Wellness",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
-      </svg>
-    )
-  },
-  {
-    name: "Future Leaders",
-    component: (
-      <svg viewBox="0 0 100 40" className="h-12 w-auto">
-        <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
-        <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
-      </svg>
-    )
-  }
-];
+// const partnerLogos = [
+//   {
+//     name: "Women's Foundation",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <rect width="100" height="40" rx="5" fill="#8b5cf6" />
+//         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Global Empowerment",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <circle cx="20" cy="20" r="15" fill="#ec4899" />
+//         <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Equal Rights Initiative",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Education First",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <polygon points="50,0 100,40 0,40" fill="#10b981" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Health & Wellness",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
+//       </svg>
+//     )
+//   },
+//   {
+//     name: "Future Leaders",
+//     component: (
+//       <svg viewBox="0 0 100 40" className="h-12 w-auto">
+//         <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
+//         <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
+//       </svg>
+//     )
+//   }
+// ];
   const programs = [
     {
       icon: <GraduationCap className="w-8 h-8" />,
@@ -348,7 +536,7 @@ const partnerLogos = [
       <section
         className="relative pt-40 min-h-screen bg-cover bg-center bg-no-repeat mt-25"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${heroImage})` ,marginTop:"100px" 
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${heroImage})`, marginTop: "100px"
         }}
       >
         <div className="pt-30 flex items-center justify-center min-h-screen">
@@ -446,7 +634,7 @@ const partnerLogos = [
         </div>
       </section>
 
-      
+
       <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
       {/* Impact Section */}
@@ -542,103 +730,133 @@ const partnerLogos = [
   </div>
 </section>
 
-      {/* Legal Awareness - Infinite Moving Carousel */}
-      <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r  from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
-              <AlertTriangle className="w-10 h-10 text-white" />
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
-              Legal Awareness
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Know your rights, get help when you need it.
-            </p>
-          </div>
-
-         {loadingAwareness ? (
-       <div className="text-center py-10">Loading awareness resources...</div>
-     ) : errorAwareness ? (
-       <div className="text-center text-red-500 py-10">{errorAwareness}</div>
-     ) : awarenessCards.length > 0 ? (
-       <div className="relative overflow-hidden py-10">
-         {/* Double the array for seamless looping */}
-         <div className="flex w-max animate-scroll-slow">
-           {[...awarenessCards, ...awarenessCards].map((card, index) => (
-           <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
-             <Card 
-               className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
-               onClick={() => handleLegalInfoClick(card)}
-             >
-               <CardContent className="p-6 h-full flex flex-col">
-                 <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
-                   {card.icon}
-                 </div>
-                 
-                 <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
-                 <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
-                 
-                 <div className="flex flex-col gap-2 mb-4">
-                   <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                     <Phone className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.phone}</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                     <AlertTriangle className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.emergency}</span>
-                   </div>
-                 </div>
-
-                 <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
-                   {card.description}
-                 </p>
-
-                 <div className="flex gap-2 mt-auto">
-                   <Button 
-                     variant="outline" 
-                     size="sm"
-                     className="flex-1 text-green-700 border-green-300 hover:bg-green-50"
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       handleEmergencyCall(card.phone, card.title);
-                     }}
-                   >
-                     <Phone className="w-4 h-4 mr-1" />
-                     Call Now
-                   </Button>
-                   <Button 
-                     variant="outline" 
-                     size="sm"
-                     className="flex-1"
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       handleLegalInfoClick(card);
-                     }}
-                   >
-                     Learn More
-                   </Button>
-                 </div>
-               </CardContent>
-             </Card>
-           </div>
-         ))}
-       </div>
-     </div>
-     ) : (
-       <div className="text-center py-10">No awareness resources available.</div>
-     )}
-
-    <div className="text-center mt-12">
-      <div className="bg-gradient-to-r from-primary/10 to-soft-purple/10 rounded-2xl p-8 border border-primary/20">
-        <h3 className="text-2xl font-bold text-foreground mb-4">Remember: You Are Not Alone</h3>
-        <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
-          These resources are confidential, free, and available 24/7.
+{/* Legal Awareness - Infinite Moving Carousel */}
+<section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
+  <div className="container mx-auto px-4">
+    <div className="text-center mb-16">
+      <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-red-500 to-pink-600 rounded-full mb-6 shadow-2xl">
+        <AlertTriangle className="w-10 h-10 text-white" />
+      </div>
+      <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+        Legal Awareness & Emergency Support
+      </h2>
+      <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+        Know your rights, get help when you need it.
+      </p>
+      <div className="mt-6 p-4 bg-red-100 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
+        <p className="text-red-800 dark:text-red-200 font-semibold flex items-center justify-center gap-2">
+          <PhoneCall className="w-5 h-5" />
+          In case of immediate danger, always call 911 first
         </p>
       </div>
     </div>
-  </div>
-</section>
+
+    <div className="relative overflow-hidden py-10">
+      {/* Double the array for seamless looping */}
+      <div className="flex w-max animate-scroll-slow">
+        {[...legalAwarenessCards, ...legalAwarenessCards].map((card, index) => (
+          <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
+            <Card 
+              className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
+              onClick={() => handleLegalInfoClick(card)}
+            >
+              <CardContent className="p-6 h-full flex flex-col">
+                <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
+                  {card.icon}
+                </div>
+                
+                <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
+                <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
+                
+                <div className="flex flex-col gap-2 mb-4">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                    <Phone className="w-4 h-4" />
+                    <span className="font-mono font-bold">{card.phone}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="font-mono font-bold">{card.emergency}</span>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
+                  {card.description}
+                </p>
+
+                <div className="flex gap-2 mt-auto">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1 text-green-700 border-green-300 hover:bg-green-50"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEmergencyCall(card.phone, card.title);
+                    }}
+                  >
+                    <Phone className="w-4 h-4 mr-1" />
+                    Call Now
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleLegalInfoClick(card);
+                    }}
+                  >
+                    Learn More
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+    </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-gradient-to-r from-primary/10 to-soft-purple/10 rounded-2xl p-8 border border-primary/20">
+              <h3 className="text-2xl font-bold text-foreground mb-4">Remember: You Are Not Alone</h3>
+              <p className="text-muted-foreground leading-relaxed max-w-2xl mx-auto">
+                These resources are confidential, free, and available 24/7.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Partners - Infinite Logo Slider */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Our Trusted Partners
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Collaborating with leading organizations to empower women worldwide
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden py-6">
+            <div className="flex w-max animate-scroll-slow items-center">
+              {/* Double the array for seamless looping */}
+              {[...partnerLogos, ...partnerLogos].map((logo, index) => (
+                <div
+                  key={index}
+                  className="px-8 flex items-center justify-center"
+                  style={{ minWidth: '200px' }}
+                >
+                  <div className="grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100">
+                        <img key={index} src={`${API_BASE_URL}${logo}`} alt={`Partner ${index}`} className="w-32 h-auto" />
+
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Join the Movement CTA */}
       <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
         <div className="container mx-auto px-4">
@@ -652,9 +870,9 @@ const partnerLogos = [
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
               {!isAuthenticated() &&
-              <Button variant="donate" size="lg" className="text-lg px-8 py-6" onClick={handleJoinUsClick}>
-                <a href="/join-us">Join Us</a>
-              </Button>
+                <Button variant="donate" size="lg" className="text-lg px-8 py-6" onClick={handleJoinUsClick}>
+                  <a href="/join-us">Join Us</a>
+                </Button>
               }
               <Button variant="empowerment" size="lg" className="text-lg px-8 py-6" onClick={handleContactClick}>
                 <a href="/contact">Contact Us</a>
@@ -668,7 +886,7 @@ const partnerLogos = [
       {showModal && activeStory && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
           <div className="bg-white max-w-3xl w-full rounded-xl overflow-hidden shadow-2xl relative grid md:grid-cols-2">
-            
+
             {/* Left: Image */}
             <div className="h-full max-h-[600px] overflow-hidden">
               <img
@@ -705,7 +923,7 @@ const partnerLogos = [
       {showLegalModal && activeLegalInfo && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
           <div className="bg-white max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            
+
             {/* Header */}
             <div className={`bg-gradient-to-r ${activeLegalInfo.color} p-6 text-white relative`}>
               <button
@@ -753,14 +971,14 @@ const partnerLogos = [
                   </div>
                 </div>
                 <div className="mt-4 flex gap-3">
-                  <Button 
+                  <Button
                     className="bg-green-600 hover:bg-green-700 text-white"
                     onClick={() => handleEmergencyCall(activeLegalInfo.phone, activeLegalInfo.title)}
                   >
                     <Phone className="w-4 h-4 mr-2" />
                     Call Hotline Now
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="border-red-300 text-red-700 hover:bg-red-50"
                     onClick={() => handleEmergencyCall('911', 'Emergency Services')}

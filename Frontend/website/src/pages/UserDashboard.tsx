@@ -13,18 +13,29 @@ import Header from "../components/Header";
 import { apiCall } from "../api/apiCall";
 import userdata from './userdata.json';
 import { useNavigate } from "react-router-dom";
+import { isngoorCompany } from "@/utils/auth";
 import { User, Event, Program, Donation, TabType, ApiErrorResponse } from "../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const UserDashboard: React.FC = () => {
+  const [showNavItems, setShowNavItems] = useState<boolean>(true);
+
   const [user, setUser] = useState<User | null>(null);
   const [userPrograms, setUserPrograms] = useState<Program[]>([]);
-  const [userDonations ,setUserDonations] = useState<Donation[]>([]);
+  const [userDonations, setUserDonations] = useState<Donation[]>([]);
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate(); // Add this if not already present
+
+  useEffect(() => {
+    // Call the async function and store its result
+    isngoorCompany().then(result => {
+      setShowNavItems(result);
+    });
+  }, []);
+
 
   const fetchData = async (): Promise<void> => {
     setLoading(true);
@@ -35,7 +46,7 @@ const UserDashboard: React.FC = () => {
         method: 'GET',
         requiresAuth: true
       });
-    
+
 
       if (!profileRes.success) {
         const errorData = profileRes.data as ApiErrorResponse;
@@ -50,29 +61,29 @@ const UserDashboard: React.FC = () => {
         setError(errorData.msg || 'Failed to fetch profile');
       } else {
         setUser(profileRes.data);
-        if(profileRes.data.role === "donor") setActiveTab("donations")
+        if (profileRes.data.role === "donor") setActiveTab("donations")
         console.log("👤 User:", profileRes.data);
       }
-      
-      // Fetch donations for donors and members
-      if(profileRes.data.role === "donor" || profileRes.data.role === "member" || profileRes.data.role === "member" ){
-        console.log("fetching donations")
-        const donationRes = await apiCall<Donation[]>({
-          url: `${API_BASE_URL}/donations/user`,
-          method: 'GET',
-          requiresAuth: true
-        });
 
-        if (donationRes.success) {
-          console.log("📘 Donations:", donationRes.data);
-          console.log(donationRes.data)
-          setUserDonations(donationRes.data.data);
-        } else {
-          const errorData = donationRes.data as ApiErrorResponse;
-          // setError(errorData.msg || 'Failed to fetch donations');
-          console.log("")
-        }
+      // Fetch donations for donors and members
+      // if(profileRes.data.role === "donor" || profileRes.data.role === "member" || profileRes.data.role === "member" ){
+      console.log("fetching donations")
+      const donationRes = await apiCall<Donation[]>({
+        url: `${API_BASE_URL}/donations/user`,
+        method: 'GET',
+        requiresAuth: true
+      });
+
+      if (donationRes.success) {
+        console.log("📘 Donations:", donationRes.data);
+        console.log(donationRes.data)
+        setUserDonations(donationRes.data.data);
+      } else {
+        const errorData = donationRes.data as ApiErrorResponse;
+        // setError(errorData.msg || 'Failed to fetch donations');
+        console.log("")
       }
+
 
       const programsRes = await apiCall<Program[]>({
         url: `${API_BASE_URL}/users/programs`,
@@ -120,17 +131,17 @@ const UserDashboard: React.FC = () => {
   };
 
   useEffect(() => {
-    
-    scrollTo(0,0)
+
+    scrollTo(0, 0)
     fetchData();
 
 
 
- 
+
   }, []);
 
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
- 
+
 
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
@@ -162,6 +173,8 @@ const UserDashboard: React.FC = () => {
           return user ? <Profile user={user} /> : <p>No user data available</p>;
         case 'courses':
           return <CompanyPrograms user={user} />;
+        case 'donations':
+          return <Donations donations={userDonations} />;
         default:
           return <CompanyDashboard user={user} />;
       }
@@ -204,7 +217,7 @@ const UserDashboard: React.FC = () => {
     // Regular user rendering
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
+        return <Dashboard  isngo={(user?.role =="ngo")} user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
       case 'profile':
         return user ? <Profile user={user} /> : <p>No user data available</p>;
       case 'events':
@@ -214,13 +227,13 @@ const UserDashboard: React.FC = () => {
       case 'donations':
         return <Donations donations={userDonations} />;
       default:
-        return <Dashboard events={userEvents} programs={userPrograms} donations={userDonations} />;
+        return <Dashboard isngo={true} events={userEvents} programs={userPrograms} donations={userDonations} />;
     }
   };
 
   return (
     <div className="bg-gray-50 min-h-screen">
-      <Header />
+      <Header showNavItems={!showNavItems} />
       {/* Mobile Header */}
       <div className="lg:hidden bg-white shadow-sm border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-24 z-40">
         {/* <div className="h-[80px]"></div> */}

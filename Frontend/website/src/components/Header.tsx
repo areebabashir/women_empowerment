@@ -12,8 +12,11 @@ type NavItem = {
   dropdown?: boolean;
   items?: { name: string; href: string }[];
 };
+type HeaderProps = {
+  showNavItems?: boolean; // Make it optional
+};
 
-const Header = () => {
+const Header = ({ showNavItems = true }: HeaderProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showDesktopDropdown, setShowDesktopDropdown] = useState(false);
@@ -81,6 +84,8 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
+
+        {showNavItems && (
           <nav className="hidden lg:flex items-center space-x-5">
             {navItems.map((item) =>
               item.dropdown ? (
@@ -118,6 +123,8 @@ const Header = () => {
                 </Link>
               )
             )}
+            </nav>
+             )}
 
             {/* CTA Buttons */}
             {!isAuthenticated() ?
@@ -131,7 +138,6 @@ const Header = () => {
             
 
             
-          </nav>
 
           {/* Mobile Menu Button */}
           <button
@@ -146,7 +152,7 @@ const Header = () => {
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-border/50 bg-background/95 backdrop-blur-md">
             <nav className="py-6 space-y-4">
-              {navItems.map((item) =>
+              {showNavItems && navItems.map((item) =>
                 item.dropdown ? (
                   <div key={item.name} className="px-4 space-y-1">
                     <button
