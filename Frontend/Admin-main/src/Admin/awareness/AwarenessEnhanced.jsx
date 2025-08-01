@@ -21,7 +21,6 @@ const AwarenessEnhanced = () => {
     description: '',
     serviceAvailable: '',
     phoneNumber: '',
-    emergencyNumber: '',
     services: [],
     icon: 'Shield'
   });
@@ -96,7 +95,6 @@ const AwarenessEnhanced = () => {
       description: '',
       serviceAvailable: '',
       phoneNumber: '',
-      emergencyNumber: '',
       services: [],
       icon: 'Shield'
     });
@@ -111,7 +109,6 @@ const AwarenessEnhanced = () => {
       description: item.description || '',
       serviceAvailable: item.serviceAvailable || '',
       phoneNumber: item.phoneNumber || '',
-      emergencyNumber: item.emergencyNumber || '',
       services: Array.isArray(item.services) ? item.services : [],
       icon: item.icon || 'Shield'
     });
@@ -171,7 +168,7 @@ const AwarenessEnhanced = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.name.trim() || !formData.description.trim() || !formData.serviceAvailable.trim() || !formData.phoneNumber.trim() || !formData.emergencyNumber.trim() || !formData.icon) {
+    if (!formData.name.trim() || !formData.description.trim() || !formData.serviceAvailable.trim() || !formData.phoneNumber.trim() || !formData.icon) {
       Swal.fire('Error', 'Required fields cannot be empty', 'error');
       return;
     }
@@ -182,7 +179,6 @@ const AwarenessEnhanced = () => {
       description: formData.description.trim(),
       serviceAvailable: formData.serviceAvailable.trim(),
       phoneNumber: formData.phoneNumber.trim(),
-      emergencyNumber: formData.emergencyNumber.trim(),
       services: JSON.stringify(formData.services),
       icon: formData.icon
     };
@@ -409,17 +405,7 @@ const AwarenessEnhanced = () => {
                       required
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Emergency Number *</label>
-                    <input
-                      type="text"
-                      value={formData.emergencyNumber}
-                      onChange={(e) => setFormData({...formData, emergencyNumber: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter emergency number"
-                      required
-                    />
-                  </div>
+
                 </div>
 
                 {/* Icon Selection */}

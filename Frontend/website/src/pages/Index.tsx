@@ -180,18 +180,17 @@ const Index = () => {
       'FileText': <FileText className="w-8 h-8" />
     };
 
-    return {
-      id: awarenessItem._id,
-      title: awarenessItem.title || awarenessItem.name,
-      name: awarenessItem.name,
-      phone: awarenessItem.phoneNumber,
-      emergency: awarenessItem.emergencyNumber,
-      description: awarenessItem.description,
-      image: awarenessItem.image,
-      services: awarenessItem.services || [],
-      icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
-      color: awarenessItem.color || "from-blue-500 to-teal-600"
-    };
+         return {
+       id: awarenessItem._id,
+       title: awarenessItem.title || awarenessItem.name,
+       name: awarenessItem.name,
+       phone: awarenessItem.phoneNumber,
+       description: awarenessItem.description,
+       image: awarenessItem.image,
+       services: awarenessItem.services || [],
+       icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
+       color: awarenessItem.color || "from-blue-500 to-teal-600"
+     };
   };
 
   // Convert API data to frontend format
@@ -585,16 +584,12 @@ const partnerLogos = [
                  <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
                  <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
                  
-                 <div className="flex flex-col gap-2 mb-4">
-                   <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                     <Phone className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.phone}</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                     <AlertTriangle className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.emergency}</span>
-                   </div>
-                 </div>
+                                   <div className="flex flex-col gap-2 mb-4">
+                    <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                      <Phone className="w-4 h-4" />
+                      <span className="font-mono font-bold">{card.phone}</span>
+                    </div>
+                  </div>
 
                  <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
                    {card.description}
@@ -742,22 +737,13 @@ const partnerLogos = [
                   <AlertTriangle className="w-6 h-6" />
                   Emergency Contacts
                 </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Main Hotline</p>
-                      <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Emergency</p>
-                      <p className="font-mono text-lg text-red-700">{activeLegalInfo.emergency}</p>
-                    </div>
-                  </div>
-                </div>
+                                 <div className="flex items-center gap-3">
+                   <Phone className="w-5 h-5 text-green-600" />
+                   <div>
+                     <p className="font-semibold text-gray-700">Main Hotline</p>
+                     <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
+                   </div>
+                 </div>
                 <div className="mt-4 flex gap-3">
                   <Button 
                     className="bg-green-600 hover:bg-green-700 text-white"

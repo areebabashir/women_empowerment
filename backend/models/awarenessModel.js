@@ -28,7 +28,6 @@ const awarenessSchema = new mongoose.Schema({
   },
   emergencyNumber: {
     type: String,
-    required: [true, 'Emergency number is required'],
     trim: true,
     maxlength: [20, 'Emergency number cannot exceed 20 characters']
   },

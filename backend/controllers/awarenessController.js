@@ -54,7 +54,7 @@ export const addAwareness = async (req, res) => {
   try {
     const { name, description, serviceAvailable, phoneNumber, emergencyNumber, title, services, icon } = req.body;
     
-    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber || !icon) {
+    if (!name || !description || !serviceAvailable || !phoneNumber || !icon) {
       return res.status(400).json({ success: false, message: 'Required fields are missing' });
     }
     
@@ -95,7 +95,7 @@ export const updateAwareness = async (req, res) => {
     const { id } = req.params;
     const { name, description, serviceAvailable, phoneNumber, emergencyNumber, title, services, icon } = req.body;
     
-    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber || !icon) {
+    if (!name || !description || !serviceAvailable || !phoneNumber || !icon) {
       return res.status(400).json({ success: false, message: 'Required fields are missing' });
     }
     
