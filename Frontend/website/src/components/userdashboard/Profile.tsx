@@ -6,8 +6,10 @@ import { apiCall } from "@/api/apiCall";
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 interface ProfileProps {
-    user: User;
+  user: User;
+  setUser: React.Dispatch<React.SetStateAction<User>>;
 }
+
 
 interface ValidationErrors {
     name?: string;
@@ -76,9 +78,9 @@ const InputField: React.FC<{
     </div>
 );
 
-const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
+const Profile: React.FC<ProfileProps> = ({ user, setUser }) => {
     const [editMode, setEditMode] = useState(false);
-    const [user, setUser] = useState<User>(initialUser);
+    // const [user, setUser] = useState<User>(initialUser);
     const [loading, setLoading] = useState(false);
     const [apiError, setApiError] = useState("");
     const [successMessage, setSuccessMessage] = useState("");
@@ -287,6 +289,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
 
             if (response.success) {
                 setUser(response.data["user"]);
+                // setuser(response.data["user"])
                 setEditMode(false);
                 setSuccessMessage("Profile updated successfully!");
                 setErrors({});
@@ -294,7 +297,7 @@ const Profile: React.FC<ProfileProps> = ({ user: initialUser }) => {
 
                 // Clear success message after 3 seconds
                 setTimeout(() => setSuccessMessage(""), 3000);
-                window.location.reload();
+                // window.location.reload();
 
             } else {
                 setApiError(response.data["msg"] || "Failed to update profile.");
