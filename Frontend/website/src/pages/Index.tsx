@@ -192,7 +192,8 @@ const Index = () => {
       image: awarenessItem.image,
       services: awarenessItem.services || [],
       icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
-      color: awarenessItem.color || "from-blue-500 to-teal-600"
+      color: "from-pink-500 to-rose-600", // Force donate variant colors
+      variant: "donate", // Force variant to donate for all legal awareness cards
     };
   };
 
@@ -549,7 +550,7 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r  from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r bg-gradient-to-r from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
               <AlertTriangle className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
@@ -560,38 +561,29 @@ const Index = () => {
             </p>
           </div>
 
-         {loadingAwareness ? (
-       <div className="text-center py-10">Loading awareness resources...</div>
-     ) : errorAwareness ? (
-       <div className="text-center text-red-500 py-10">{errorAwareness}</div>
-     ) : awarenessCards.length > 0 ? (
-       <div className="relative overflow-hidden py-10">
-         {/* Double the array for seamless looping */}
-         <div className="flex w-max animate-scroll-slow">
-           {[...awarenessCards, ...awarenessCards].map((card, index) => (
-           <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
-             <Card 
-               className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
-               onClick={() => handleLegalInfoClick(card)}
-             >
-               <CardContent className="p-6 h-full flex flex-col">
-                 <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
-                   {card.icon}
-                 </div>
-                 
-                 <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
-                 <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
-                 
-                 <div className="flex flex-col gap-2 mb-4">
-                   <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                     <Phone className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.phone}</span>
-                   </div>
-                   <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                     <AlertTriangle className="w-4 h-4" />
-                     <span className="font-mono font-bold">{card.emergency}</span>
-                   </div>
-                 </div>
+          {loadingAwareness ? (
+            <div className="text-center py-10">Loading awareness resources...</div>
+          ) : errorAwareness ? (
+            <div className="text-center text-red-500 py-10">{errorAwareness}</div>
+          ) : awarenessCards.length > 0 ? (
+            <div className="relative overflow-hidden py-10">
+              {/* Double the array for seamless looping */}
+              <div className="flex w-max animate-scroll-slow">
+                {[...awarenessCards, ...awarenessCards].map((card, index) => (
+                  <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
+                    <Card 
+                      className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
+                      onClick={() => handleLegalInfoClick(card)}
+                    >
+                      <CardContent className="p-6 h-full flex flex-col">
+                        <div className={`w-16 h-16  bg-gradient-to-r from-primary to-soft-purple rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
+                          {card.icon}
+                        </div>
+                        
+                        <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
+                        <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
+                        
+                     
 
                         <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
                           {card.description}
@@ -715,47 +707,7 @@ const Index = () => {
 
             {/* Content */}
             <div className="p-8">
-              {/* Emergency Contact Section */}
-              <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-                <h4 className="text-xl font-bold text-red-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-6 h-6" />
-                  Emergency Contacts
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <Phone className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Main Hotline</p>
-                      <p className="font-mono text-lg text-green-700">{activeLegalInfo.phone}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <AlertTriangle className="w-5 h-5 text-red-600" />
-                    <div>
-                      <p className="font-semibold text-gray-700">Emergency</p>
-                      <p className="font-mono text-lg text-red-700">{activeLegalInfo.emergency}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 flex gap-3">
-                  <Button 
-                    className="bg-green-600 hover:bg-green-700 text-white"
-                    onClick={() => handleEmergencyCall(activeLegalInfo.phone, activeLegalInfo.title)}
-                  >
-                    <Phone className="w-4 h-4 mr-2" />
-                    Call Hotline Now
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="border-red-300 text-red-700 hover:bg-red-50"
-                    onClick={() => handleEmergencyCall('911', 'Emergency Services')}
-                  >
-                    <PhoneCall className="w-4 h-4 mr-2" />
-                    Call 911
-                  </Button>
-                </div>
-              </div>
-
+             
               {/* Description */}
               <div className="mb-8">
                 <h4 className="text-2xl font-bold text-gray-800 mb-4">About This Service</h4>
