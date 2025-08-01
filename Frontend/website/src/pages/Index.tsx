@@ -27,9 +27,10 @@ import "keen-slider/keen-slider.min.css";
 import heroImage from "@/assets/hero-empowered-women.jpg";
 import supportImage from "@/assets/women-supporting-each-other.jpg";
 import successStoryImage from "@/assets/success-story-woman.jpg";
-import { useEffect, useState } from "react";
-import { getAllSuccessStories } from "@/services/api";
+import { useEffect, useState, Fragment } from "react";
+import { getAllSuccessStories, getAllAwareness } from "@/services/api";
 import toast from "react-hot-toast";
+import { getImageUrl } from "@/utils/imageUtils";
 
 const Index = () => {
   const [impactCounts, setImpactCounts] = useState({
@@ -60,8 +61,8 @@ const Index = () => {
     },
   });
 
-  // Keen Slider configuration for Legal Awareness
-  const [legalSliderRef] = useKeenSlider({
+  // Keen Slider configuration for Awareness
+  const [awarenessSliderRef] = useKeenSlider({
     loop: true,
     breakpoints: {
       "(min-width: 768px)": {
@@ -93,112 +94,11 @@ const Index = () => {
   const [activeStory, setActiveStory] = useState(null);
   const [showLegalModal, setShowLegalModal] = useState(false);
   const [activeLegalInfo, setActiveLegalInfo] = useState(null);
+  const [awarenessData, setAwarenessData] = useState([]);
+  const [loadingAwareness, setLoadingAwareness] = useState(true);
+  const [errorAwareness, setErrorAwareness] = useState(null);
 
-  // Legal Awareness Data
-  const legalAwarenessCards = [
-    {
-      id: 1,
-      title: "Domestic Violence Helpline",
-      name: "National Domestic Violence Hotline",
-      phone: "1-800-799-7233",
-      emergency: "911",
-      description: "24/7 confidential support for victims of domestic violence. Trained advocates provide crisis intervention, safety planning, and referrals to local resources.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "Crisis intervention and emotional support",
-        "Safety planning assistance", 
-        "Local shelter and resource referrals",
-        "Legal advocacy information"
-      ],
-      icon: <Heart className="w-8 h-8" />,
-      color: "from-red-500 to-pink-600"
-    },
-    {
-      id: 2,
-      title: "Sexual Assault Support",
-      name: "RAINN National Sexual Assault Hotline",
-      phone: "1-800-656-4673",
-      emergency: "911",
-      description: "Free, confidential support for survivors of sexual assault. Connects you with trained staff from local sexual assault service providers.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "24/7 crisis counseling",
-        "Medical and legal advocacy",
-        "Support group referrals",
-        "Online chat support available"
-      ],
-      icon: <Shield className="w-8 h-8" />,
-      color: "from-purple-500 to-indigo-600"
-    },
-    {
-      id: 3,
-      title: "Legal Aid Services",
-      name: "Women's Law Center",
-      phone: "1-800-HELP-LAW",
-      emergency: "For emergencies call 911",
-      description: "Free legal assistance for women facing discrimination, family law issues, and workplace harassment. Know your rights and get help.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "Family law and divorce assistance",
-        "Employment discrimination cases",
-        "Housing rights advocacy",
-        "Immigration law support"
-      ],
-      icon: <Scale className="w-8 h-8" />,
-      color: "from-blue-500 to-teal-600"
-    },
-    {
-      id: 4,
-      title: "Mental Health Crisis",
-      name: "Crisis Text Line",
-      phone: "Text HOME to 741741",
-      emergency: "988 - Suicide Prevention",
-      description: "Free, 24/7 mental health support via text message. Trained crisis counselors provide immediate emotional support.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "Text-based crisis counseling",
-        "Suicide prevention support",
-        "Mental health resource referrals",
-        "Anonymous and confidential"
-      ],
-      icon: <Heart className="w-8 h-8" />,
-      color: "from-green-500 to-emerald-600"
-    },
-    {
-      id: 5,
-      title: "Workplace Rights",
-      name: "Equal Employment Opportunity Commission",
-      phone: "1-800-669-4000",
-      emergency: "Document incidents immediately",
-      description: "Report workplace discrimination, harassment, and violations of your employment rights. Free consultation and investigation services.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "Sexual harassment reporting",
-        "Wage discrimination claims",
-        "Pregnancy discrimination support",
-        "Workplace accommodation requests"
-      ],
-      icon: <Building className="w-8 h-8" />,
-      color: "from-orange-500 to-red-600"
-    },
-    {
-      id: 6,
-      title: "Housing Assistance",
-      name: "National Housing Law Project",
-      phone: "1-800-HOUSING",
-      emergency: "Contact local police for illegal evictions",
-      description: "Legal assistance for housing discrimination, tenant rights, and preventing homelessness. Protecting your right to safe housing.",
-      image: "/api/placeholder/300/200",
-      services: [
-        "Tenant rights education",
-        "Housing discrimination cases",
-        "Eviction prevention assistance",
-        "Accessible housing advocacy"
-      ],
-      icon: <MapPin className="w-8 h-8" />,
-      color: "from-indigo-500 to-purple-600"
-    }
-  ];
+  // Awareness Data will be loaded from API
 
   useEffect(() => {
     scrollTo(0,0)
@@ -249,6 +149,54 @@ const Index = () => {
     }
     fetchStories();
   }, [toast]);
+
+  useEffect(() => {
+    async function fetchAwareness() {
+      try {
+        const data = await getAllAwareness();
+        const awarenessItems = Array.isArray(data) ? data : data.awareness || data.data || [];
+        setAwarenessData(awarenessItems);
+      } catch (err) {
+        setErrorAwareness("Failed to load awareness data");
+        toast.error("Unable to load awareness data. Please try again later.");
+      } finally {
+        setLoadingAwareness(false);
+      }
+    }
+    fetchAwareness();
+  }, [toast]);
+
+  // Helper function to convert API data to frontend format
+  const convertAwarenessToFrontendFormat = (awarenessItem) => {
+    const iconMap = {
+      'Heart': <Heart className="w-8 h-8" />,
+      'Shield': <Shield className="w-8 h-8" />,
+      'Scale': <Scale className="w-8 h-8" />,
+      'Building': <Building className="w-8 h-8" />,
+      'MapPin': <MapPin className="w-8 h-8" />,
+      'Globe': <Globe className="w-8 h-8" />,
+      'Users': <Users className="w-8 h-8" />,
+      'GraduationCap': <GraduationCap className="w-8 h-8" />,
+      'FileText': <FileText className="w-8 h-8" />
+    };
+
+    return {
+      id: awarenessItem._id,
+      title: awarenessItem.title || awarenessItem.name,
+      name: awarenessItem.name,
+      phone: awarenessItem.phoneNumber,
+      emergency: awarenessItem.emergencyNumber,
+      description: awarenessItem.description,
+      image: awarenessItem.image,
+      services: awarenessItem.services || [],
+      icon: iconMap[awarenessItem.icon] || <Shield className="w-8 h-8" />,
+      color: awarenessItem.color || "from-blue-500 to-teal-600"
+    };
+  };
+
+  // Convert API data to frontend format
+  const awarenessCards = awarenessData.map(convertAwarenessToFrontendFormat);
+
 const partnerLogos = [
   {
     name: "Women's Foundation",
@@ -588,13 +536,13 @@ const partnerLogos = [
           ))}
         </div>
       </div>
-    ) : (
-      <div className="text-center py-10">No success stories available.</div>
-    )}
+     ) : (
+       <div className="text-center py-10">No awareness resources available.</div>
+     )}
   </div>
 </section>
 
-{/* Legal Awareness - Infinite Moving Carousel */}
+        {/* Awareness - Infinite Moving Carousel */}
 <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
   <div className="container mx-auto px-4">
     <div className="text-center mb-16">
@@ -602,7 +550,7 @@ const partnerLogos = [
         <AlertTriangle className="w-10 h-10 text-white" />
       </div>
       <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-        Legal Awareness & Emergency Support
+                    Awareness & Emergency Support
       </h2>
       <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
         Know your rights, get help when you need it.
@@ -615,69 +563,77 @@ const partnerLogos = [
       </div>
     </div>
 
-    <div className="relative overflow-hidden py-10">
-      {/* Double the array for seamless looping */}
-      <div className="flex w-max animate-scroll-slow">
-        {[...legalAwarenessCards, ...legalAwarenessCards].map((card, index) => (
-          <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
-            <Card 
-              className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
-              onClick={() => handleLegalInfoClick(card)}
-            >
-              <CardContent className="p-6 h-full flex flex-col">
-                <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
-                  {card.icon}
-                </div>
-                
-                <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
-                <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
-                
-                <div className="flex flex-col gap-2 mb-4">
-                  <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
-                    <Phone className="w-4 h-4" />
-                    <span className="font-mono font-bold">{card.phone}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-                    <AlertTriangle className="w-4 h-4" />
-                    <span className="font-mono font-bold">{card.emergency}</span>
-                  </div>
-                </div>
+         {loadingAwareness ? (
+       <div className="text-center py-10">Loading awareness resources...</div>
+     ) : errorAwareness ? (
+       <div className="text-center text-red-500 py-10">{errorAwareness}</div>
+     ) : awarenessCards.length > 0 ? (
+       <div className="relative overflow-hidden py-10">
+         {/* Double the array for seamless looping */}
+         <div className="flex w-max animate-scroll-slow">
+           {[...awarenessCards, ...awarenessCards].map((card, index) => (
+           <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
+             <Card 
+               className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
+               onClick={() => handleLegalInfoClick(card)}
+             >
+               <CardContent className="p-6 h-full flex flex-col">
+                 <div className={`w-16 h-16 bg-gradient-to-br ${card.color} rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
+                   {card.icon}
+                 </div>
+                 
+                 <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
+                 <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
+                 
+                 <div className="flex flex-col gap-2 mb-4">
+                   <div className="flex items-center gap-2 text-green-700 dark:text-green-300">
+                     <Phone className="w-4 h-4" />
+                     <span className="font-mono font-bold">{card.phone}</span>
+                   </div>
+                   <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                     <AlertTriangle className="w-4 h-4" />
+                     <span className="font-mono font-bold">{card.emergency}</span>
+                   </div>
+                 </div>
 
-                <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
-                  {card.description}
-                </p>
+                 <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
+                   {card.description}
+                 </p>
 
-                <div className="flex gap-2 mt-auto">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1 text-green-700 border-green-300 hover:bg-green-50"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEmergencyCall(card.phone, card.title);
-                    }}
-                  >
-                    <Phone className="w-4 h-4 mr-1" />
-                    Call Now
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="flex-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleLegalInfoClick(card);
-                    }}
-                  >
-                    Learn More
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        ))}
-      </div>
-    </div>
+                 <div className="flex gap-2 mt-auto">
+                   <Button 
+                     variant="outline" 
+                     size="sm"
+                     className="flex-1 text-green-700 border-green-300 hover:bg-green-50"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleEmergencyCall(card.phone, card.title);
+                     }}
+                   >
+                     <Phone className="w-4 h-4 mr-1" />
+                     Call Now
+                   </Button>
+                   <Button 
+                     variant="outline" 
+                     size="sm"
+                     className="flex-1"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       handleLegalInfoClick(card);
+                     }}
+                   >
+                     Learn More
+                   </Button>
+                 </div>
+               </CardContent>
+             </Card>
+           </div>
+         ))}
+       </div>
+     </div>
+     ) : (
+       <div className="text-center py-10">No awareness resources available.</div>
+     )}
 
     <div className="text-center mt-12">
       <div className="bg-gradient-to-r from-primary/10 to-soft-purple/10 rounded-2xl p-8 border border-primary/20">
@@ -751,7 +707,7 @@ const partnerLogos = [
         </div>
       )}
 
-      {/* Legal Awareness Modal */}
+              {/* Awareness Modal */}
       {showLegalModal && activeLegalInfo && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
           <div className="bg-white max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">

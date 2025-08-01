@@ -12,7 +12,8 @@ import contactUsRoute from './routes/contactUsRoute.js';
 import galleryRoute from './routes/galleryRoute.js';
 import podcastRoute from './routes/podcastRoute.js';
 import donationRoute from "./routes/donationRoute.js"
-import awarenessRoute from './routes/awarenessRoute.js';
+import awarenessRoute from "./routes/awarenessRoute.js"
+
 import path from 'path';
 
 
@@ -46,7 +47,6 @@ app.use('/api/gallery', galleryRoute);
 app.use('/api/podcasts', podcastRoute);
 app.use('/api/donations' , donationRoute);
 app.use('/api/awareness', awarenessRoute);
-
 
 // Set the PORT from environment variables or default to 8000
 const PORT = process.env.PORT || 8000;

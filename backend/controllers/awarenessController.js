@@ -1,34 +1,34 @@
 import Awareness from '../models/awarenessModel.js';
 
+// Helper function to get random icon
+const getRandomIcon = () => {
+  const icons = ['Heart', 'Shield', 'Scale', 'Building', 'MapPin', 'Globe', 'Users', 'GraduationCap', 'FileText'];
+  return icons[Math.floor(Math.random() * icons.length)];
+};
+
+// Helper function to get random color
+const getRandomColor = () => {
+  const colors = [
+    'from-red-500 to-pink-600',
+    'from-purple-500 to-indigo-600', 
+    'from-blue-500 to-teal-600',
+    'from-green-500 to-emerald-600',
+    'from-orange-500 to-red-600',
+    'from-indigo-500 to-purple-600',
+    'from-pink-500 to-rose-600',
+    'from-yellow-500 to-orange-600'
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 // Get all awareness items
 export const getAllAwareness = async (req, res) => {
   try {
-    const { page = 1, limit = 10, search } = req.query;
-    
-    let query = { isActive: true };
-    
-    // Add search functionality
-    if (search) {
-      query.$text = { $search: search };
-    }
-    
-    const awareness = await Awareness.find(query)
-      .sort({ createdAt: -1 })
-      .limit(limit * 1)
-      .skip((page - 1) * limit);
-    
-    const total = await Awareness.countDocuments(query);
-    
-    res.status(200).json({
-      success: true,
-      awareness,
-      totalPages: Math.ceil(total / limit),
-      currentPage: parseInt(page),
-      total
-    });
+    const awareness = await Awareness.find({ isActive: true }).sort({ createdAt: -1 });
+    res.status(200).json({ success: true, awareness });
   } catch (error) {
-    console.error('Get awareness error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error fetching awareness:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch awareness data' });
   }
 };
 
@@ -44,106 +44,81 @@ export const getAwarenessById = async (req, res) => {
     
     res.status(200).json({ success: true, awareness });
   } catch (error) {
-    console.error('Get awareness by ID error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error fetching awareness by ID:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch awareness item' });
   }
 };
 
 // Add a new awareness item
 export const addAwareness = async (req, res) => {
   try {
-    console.log('Add awareness request received:', {
-      body: req.body,
-      file: req.file
-    });
+    const { name, description, serviceAvailable, phoneNumber, emergencyNumber, title, services, icon } = req.body;
     
-    const { name, description, serviceAvailable, phoneNumber, emergencyNumber } = req.body;
-    
-    // Validate required fields
-    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Name, description, service available, phone number, and emergency number are required" 
-      });
+    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber || !icon) {
+      return res.status(400).json({ success: false, message: 'Required fields are missing' });
     }
     
-    // Check if image was uploaded
-    if (!req.file) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Image is required" 
-      });
+    // Parse services if it's a string
+    let servicesArray = services;
+    if (typeof services === 'string') {
+      try {
+        servicesArray = JSON.parse(services);
+      } catch (e) {
+        servicesArray = [services];
+      }
     }
-    
-    // Save the full path to the image
-    const image = `uploads/images/${req.file.filename}`;
     
     const newAwareness = new Awareness({
       name,
       description,
-      image,
       serviceAvailable,
       phoneNumber,
-      emergencyNumber
+      emergencyNumber,
+      title: title || name,
+      services: servicesArray || [],
+      icon: icon,
+      color: getRandomColor()
     });
     
     await newAwareness.save();
     
-    console.log('Awareness created successfully:', newAwareness);
     res.status(201).json({ success: true, awareness: newAwareness });
   } catch (error) {
-    console.error('Add awareness error:', error);
-    
-    // Handle specific validation errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ 
-        success: false, 
-        message: "Validation error", 
-        errors: validationErrors 
-      });
-    }
-    
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error adding awareness:', error);
+    res.status(500).json({ success: false, message: 'Failed to add awareness item' });
   }
 };
 
 // Update an awareness item
 export const updateAwareness = async (req, res) => {
   try {
-    console.log('Update awareness request received:', {
-      id: req.params.id,
-      body: req.body,
-      file: req.file
-    });
-    
     const { id } = req.params;
-    const { name, description, serviceAvailable, phoneNumber, emergencyNumber } = req.body;
+    const { name, description, serviceAvailable, phoneNumber, emergencyNumber, title, services, icon } = req.body;
     
-    // Validate required fields
-    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Name, description, service available, phone number, and emergency number are required" 
-      });
+    if (!name || !description || !serviceAvailable || !phoneNumber || !emergencyNumber || !icon) {
+      return res.status(400).json({ success: false, message: 'Required fields are missing' });
     }
     
-    // Prepare update data
+    // Parse services if it's a string
+    let servicesArray = services;
+    if (typeof services === 'string') {
+      try {
+        servicesArray = JSON.parse(services);
+      } catch (e) {
+        servicesArray = [services];
+      }
+    }
+    
     const updateData = {
       name,
       description,
       serviceAvailable,
       phoneNumber,
-      emergencyNumber
+      emergencyNumber,
+      title: title || name,
+      services: servicesArray || [],
+      icon: icon
     };
-    
-    // Only update image if a new file is uploaded
-    if (req.file) {
-      updateData.image = `uploads/images/${req.file.filename}`;
-      console.log('New image uploaded:', updateData.image);
-    }
-    
-    console.log('Updating awareness with data:', updateData);
     
     const updatedAwareness = await Awareness.findByIdAndUpdate(
       id,
@@ -155,30 +130,10 @@ export const updateAwareness = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Awareness item not found' });
     }
     
-    console.log('Awareness updated successfully:', updatedAwareness);
     res.status(200).json({ success: true, awareness: updatedAwareness });
   } catch (error) {
-    console.error('Update awareness error:', error);
-    
-    // Handle specific validation errors
-    if (error.name === 'ValidationError') {
-      const validationErrors = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({ 
-        success: false, 
-        message: "Validation error", 
-        errors: validationErrors 
-      });
-    }
-    
-    // Handle MongoDB errors
-    if (error.name === 'CastError') {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Invalid awareness ID format" 
-      });
-    }
-    
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error updating awareness:', error);
+    res.status(500).json({ success: false, message: 'Failed to update awareness item' });
   }
 };
 
@@ -194,8 +149,8 @@ export const deleteAwareness = async (req, res) => {
     
     res.status(200).json({ success: true, message: 'Awareness item deleted successfully' });
   } catch (error) {
-    console.error('Delete awareness error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error deleting awareness:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete awareness item' });
   }
 };
 
@@ -214,11 +169,11 @@ export const toggleAwarenessStatus = async (req, res) => {
     
     res.status(200).json({ 
       success: true, 
-      message: `Awareness ${awareness.isActive ? 'activated' : 'deactivated'} successfully`,
-      awareness 
+      awareness,
+      message: `Awareness item ${awareness.isActive ? 'activated' : 'deactivated'} successfully` 
     });
   } catch (error) {
-    console.error('Toggle awareness status error:', error);
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Error toggling awareness status:', error);
+    res.status(500).json({ success: false, message: 'Failed to toggle awareness status' });
   }
 }; 

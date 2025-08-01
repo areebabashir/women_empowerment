@@ -15,7 +15,7 @@ function SideBar() {
     { to: "/Admin/Gallery", icon: faImages, label: "Gallery" },
     { to: "/Admin/Donations", icon: faImages, label: "Donation" },
     { to: "/Admin/Podcast", icon: faPodcast, label: "Podcast" },
-    { to: "/Admin/Awareness", icon: faLightbulb, label: "Legal Awareness" },
+    { to: "/Admin/Awareness", icon: faLightbulb, label: "Awareness" },
     { to: "/Admin/Users", icon: faUser, label: "Users" },
     { to: "/Admin/contact", icon: faEnvelope, label: "Contact" },
     { to: "/Admin/Team", icon: faUsers, label: "Team" },

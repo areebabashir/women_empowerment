@@ -13,10 +13,7 @@ const awarenessSchema = new mongoose.Schema({
     trim: true,
     maxlength: [1000, 'Description cannot exceed 1000 characters']
   },
-  image: {
-    type: String,
-    required: [true, 'Image is required']
-  },
+
   serviceAvailable: {
     type: String,
     required: [true, 'Service available is required'],
@@ -38,13 +35,40 @@ const awarenessSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  // Legal awareness specific fields
+  title: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Title cannot exceed 100 characters']
+  },
+  services: [{
+    type: String,
+    trim: true
+  }],
+  icon: {
+    type: String,
+    required: [true, 'Icon is required'],
+    enum: [
+      'Heart', 'Shield', 'Scale', 'Building', 'MapPin',
+      'Globe', 'Users', 'GraduationCap', 'FileText'
+    ]
+  },
+  color: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true
 });
 
 // Add text index for search functionality
-awarenessSchema.index({ name: 'text', description: 'text', serviceAvailable: 'text' });
+awarenessSchema.index({
+  name: 'text',
+  description: 'text',
+  serviceAvailable: 'text',
+  title: 'text'
+});
 
 const Awareness = mongoose.model('Awareness', awarenessSchema);
 

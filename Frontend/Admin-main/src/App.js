@@ -31,7 +31,7 @@ import AddPodcast from "./Admin/podcast/AddPodcast";
 import UpdatePodcast from "./Admin/podcast/UpdatePodcast";
 import EventParticipants from "./Admin/event/EventParticipants";
 import ProgramParticipants from "./Admin/program/ProgramParticipants";
-import Awareness from "./Admin/awareness/Awareness";
+import AwarenessEnhanced from "./Admin/awareness/AwarenessEnhanced";
 
 import Donations from "./Admin/Donation/Donation.jsx";
 
@@ -73,7 +73,7 @@ function App() {
         <Route path="/Admin/Podcast" element={<ProtectedRoute><Podcast /></ProtectedRoute>} />
         <Route path="/Admin/Podcast/New" element={<ProtectedRoute><AddPodcast /></ProtectedRoute>} />
         <Route path="/Admin/Podcast/Update/:id" element={<ProtectedRoute><UpdatePodcast /></ProtectedRoute>} />
-        <Route path="/Admin/Awareness" element={<ProtectedRoute><Awareness /></ProtectedRoute>} />
+        <Route path="/Admin/Awareness" element={<ProtectedRoute><AwarenessEnhanced /></ProtectedRoute>} />
         
         {/* Participant Management Routes */}
         <Route path="/Admin/Event/Participants/:eventId" element={<ProtectedRoute><EventParticipants /></ProtectedRoute>} />
