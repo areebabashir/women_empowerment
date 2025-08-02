@@ -34,7 +34,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
       if (file) {
         // Validate file type
         if (!file.type.startsWith('image/')) {
-          Swal.fire('Error', 'Please select an image file', 'error');
+          Swal.fire('Error', 'Please select an image file (JPG, PNG, GIF)', 'error');
           return;
         }
         // Validate file size (max 5MB)
@@ -56,18 +56,50 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
     }
   };
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      position: '',
+      bio: '',
+      pic: null,
+      previewImage: null
+    });
+    // Clear any file input
+    const fileInput = document.querySelector('input[name="pic"]');
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.name.trim() || !formData.position.trim()) {
-      Swal.fire('Error', 'Name and Position are required fields', 'error');
+    if (!formData.name.trim()) {
+      Swal.fire('Error', 'Name is required', 'error');
       return;
     }
     
-    // Validate that an image is selected
-    if (!formData.pic) {
-      Swal.fire('Error', 'Please select an image for the team member', 'error');
+    if (!formData.position.trim()) {
+      Swal.fire('Error', 'Position is required', 'error');
+      return;
+    }
+    
+    // Validate name length
+    if (formData.name.trim().length < 2) {
+      Swal.fire('Error', 'Name must be at least 2 characters long', 'error');
+      return;
+    }
+    
+    // Validate position length
+    if (formData.position.trim().length < 2) {
+      Swal.fire('Error', 'Position must be at least 2 characters long', 'error');
+      return;
+    }
+    
+    // Validate bio length if provided
+    if (formData.bio && formData.bio.trim().length > 500) {
+      Swal.fire('Error', 'Bio must be less than 500 characters', 'error');
       return;
     }
     
@@ -75,45 +107,53 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
     const data = new FormData();
     data.append('name', formData.name.trim());
     data.append('position', formData.position.trim());
-    data.append('bio', formData.bio.trim());
-    data.append('pic', formData.pic); // Always append pic since it's required
+    data.append('bio', formData.bio.trim() || '');
+    
+    // Only append pic if a file is selected
+    if (formData.pic) {
+      data.append('pic', formData.pic);
+    }
 
     try {
       const response = await axios.post('http://localhost:8000/api/teams/addteams', data, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        },
+        timeout: 10000 // 10 second timeout
+      });
+      
+      if (response.data.success) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: `${formData.name} has been added to the team successfully.`
+        });
+        
+        // Reset form and close modal
+        resetForm();
+        setShowModal(false);
+        
+        // Notify parent component that a new member was added
+        if (onTeamAdded) {
+          onTeamAdded();
         }
-      });
-      
-      Swal.fire({
-        icon: 'success',
-        title: 'Team Member Added',
-        text: `${formData.name} has been added to the team.`
-      });
-      
-      // Reset form and close modal
-      setFormData({
-        name: '',
-        position: '',
-        bio: '',
-        pic: '',
-        previewImage:''
-      });
-      setShowModal(false);
-      
-      // Notify parent component that a new member was added
-      if (onTeamAdded) {
-        onTeamAdded();
+      } else {
+        throw new Error(response.data.message || 'Failed to add team member');
       }
     } catch (error) {
       console.error('Add team member error:', error);
-      console.error('Error response data:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      console.error('Error headers:', error.response?.headers);
       
       let errorMessage = 'An error occurred while adding the team member';
       
-      if (error.response?.data?.message) {
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Request timed out. Please check your internet connection and try again.';
+      } else if (error.code === 'ERR_NETWORK') {
+        errorMessage = 'Network error. Please check if the server is running.';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'API endpoint not found.';
+      } else if (error.response?.status >= 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.data?.error) {
         errorMessage = error.response.data.error;
@@ -131,6 +171,11 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
     }
   };
 
+  const handleCloseModal = () => {
+    resetForm();
+    setShowModal(false);
+  };
+
   if (!showModal) return null;
 
   return (
@@ -140,7 +185,7 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-2xl font-bold text-gray-800">Add Team Member</h2>
             <button 
-              onClick={() => setShowModal(false)}
+              onClick={handleCloseModal}
               className="text-gray-400 hover:text-gray-700 text-2xl"
             >
               <FontAwesomeIcon icon={faTimes} />
@@ -164,17 +209,16 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
                 )}
               </div>
               <label className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                <span>Upload Image *</span>
+                <span>Upload Image</span>
                 <input 
                   type="file" 
                   name="pic"
                   accept="image/*"
                   onChange={handleChange}
-                  required
                   className="hidden"
                 />
               </label>
-              <p className="text-xs text-gray-500 mt-2">Max size: 5MB, Supported: JPG, PNG, GIF *Required</p>
+              <p className="text-xs text-gray-500 mt-2">Max size: 5MB, Supported: JPG, PNG, GIF (Optional)</p>
             </div>
 
             {/* Name Field */}
@@ -217,12 +261,19 @@ const AddTeamModal = ({ showModal, setShowModal, onTeamAdded }) => {
                 onChange={handleChange}
                 rows="3"
                 className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Enter member's bio"
+                placeholder="Enter member's bio (optional)"
               />
             </div>
 
             {/* Action Buttons */}
             <div className="flex justify-end space-x-3 pt-4">
+              <button
+                type="button"
+                onClick={handleCloseModal}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              >
+                Cancel
+              </button>
               <button
                 type="submit"
                 disabled={loading}
@@ -681,7 +732,6 @@ const TeamData = ({ teamData, currentPage, itemsPerPage, setTeamData, refreshTea
 const Team = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [teamData, setTeamData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState("newest");
@@ -694,46 +744,54 @@ const Team = () => {
       setError(null);
 
       const response = await axios.get('http://localhost:8000/api/teams/getallteams');
-      const teamArray = Array.isArray(response.data) ? response.data : response.data.team;
       
-      if (!Array.isArray(teamArray)) throw new Error('No team data received');
+      // Handle different response formats
+      let teamArray;
+      if (Array.isArray(response.data)) {
+        teamArray = response.data;
+      } else if (response.data && Array.isArray(response.data.team)) {
+        teamArray = response.data.team;
+      } else if (response.data && response.data.success && Array.isArray(response.data.data)) {
+        teamArray = response.data.data;
+      } else {
+        throw new Error('Invalid response format from server');
+      }
+      
+      if (!Array.isArray(teamArray)) {
+        throw new Error('No team data received');
+      }
 
       const transformedData = teamArray.map(member => ({
-        id: member._id,
-        name: member.name,
-        position: member.position,
+        id: member._id || member.id,
+        name: member.name || 'Unknown',
+        position: member.position || 'Unknown',
         pic: member.pic 
           ? (member.pic.startsWith('http') ? member.pic : `http://localhost:8000/${member.pic}`)
           : 'https://randomuser.me/api/portraits/lego/1.jpg',
-        bio: member.bio,
+        bio: member.bio || '',
         createdAt: member.createdAt || new Date().toISOString()
       }));
 
       setTeamData(transformedData);
     } catch (err) {
       console.error('Fetch team error:', err);
-      setError(err.message || 'Failed to load team members');
       
-      // Fallback to mock data if API fails
-      const mockTeam = [
-        {
-          id: 1,
-          name: 'Alice Johnson',
-          position: 'Project Manager',
-          pic: 'https://randomuser.me/api/portraits/women/44.jpg',
-          bio: 'Alice is an experienced project manager with a passion for agile methodologies.',
-          createdAt: '2023-01-15T10:00:00Z'
-        },
-        {
-          id: 2,
-          name: 'Bob Smith',
-          position: 'Lead Developer',
-          pic: 'https://randomuser.me/api/portraits/men/32.jpg',
-          bio: 'Bob specializes in full-stack development and loves working with React and Node.js.',
-          createdAt: '2023-02-20T10:00:00Z'
-        },
-      ];
-      setTeamData(mockTeam);
+      let errorMessage = 'Failed to load team members';
+      
+      if (err.code === 'ERR_NETWORK') {
+        errorMessage = 'Network error. Please check if the server is running.';
+      } else if (err.response?.status === 404) {
+        errorMessage = 'Team data not found.';
+      } else if (err.response?.status >= 500) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
+      
+      // Don't set mock data on error, just show the error message
+      setTeamData([]);
     } finally {
       setLoading(false);
     }
@@ -742,15 +800,6 @@ const Team = () => {
   useEffect(() => {
     fetchTeam();
   }, []);
-
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
@@ -772,17 +821,20 @@ const Team = () => {
     }
   };
 
-  const filteredTeam = teamData.filter(member =>
-    member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    member.position?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const sortedTeam = sortTeam(teamData);
+  const totalPages = Math.ceil(sortedTeam.length / itemsPerPage);
 
-  const sortedAndFilteredTeam = sortTeam(filteredTeam);
-  const totalPages = Math.ceil(sortedAndFilteredTeam.length / itemsPerPage);
-
-  const handleTeamAdded = (newMember) => {
-    fetchTeam(); // refresh the list
-    setSearchQuery(newMember.name); // set search to new member's name
+  const handleTeamAdded = () => {
+    // Refresh the team data
+    fetchTeam();
+    // Show a success message
+    Swal.fire({
+      icon: 'success',
+      title: 'Team Updated',
+      text: 'The team list has been refreshed successfully.',
+      timer: 2000,
+      showConfirmButton: false
+    });
   };
 
   return (
@@ -799,30 +851,9 @@ const Team = () => {
           </button>
         </div>
 
-        {/* Search and Filter */}
+        {/* Sort Filter */}
         <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search team members..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="pl-10 pr-10 py-2 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="text-gray-400" />
-                </button>
-              )}
-            </div>
-
             <select
               value={sortOption}
               onChange={handleSortChange}
@@ -849,14 +880,22 @@ const Team = () => {
               </svg>
               <span className="font-medium">Error: {error}</span>
             </div>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-2 bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm"
-            >
-              Retry
-            </button>
+            <div className="mt-2 flex gap-2">
+              <button
+                onClick={fetchTeam}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm"
+              >
+                Retry
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-1.5 rounded text-sm"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
-        ) : sortedAndFilteredTeam.length === 0 ? (
+        ) : sortedTeam.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
             <div className="text-gray-400 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -864,24 +903,22 @@ const Team = () => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-700 mb-1">
-              {searchQuery ? 'No matching team members found' : 'No team members available'}
+              No team members available
             </h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery ? 'Try a different search term' : 'Add your first team member to get started'}
+              Add your first team member to get started
             </p>
-            {!searchQuery && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm"
-              >
-                Add Team Member
-              </button>
-            )}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm"
+            >
+              Add Team Member
+            </button>
           </div>
         ) : (
           <>
             <TeamData
-              teamData={sortedAndFilteredTeam}
+              teamData={sortedTeam}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               setTeamData={setTeamData}

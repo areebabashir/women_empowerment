@@ -16,9 +16,9 @@ const awarenessSchema = new mongoose.Schema({
 
   serviceAvailable: {
     type: String,
-    required: [true, 'Service available is required'],
+    required: [true, 'Legal awareness is required'],
     trim: true,
-    maxlength: [200, 'Service available cannot exceed 200 characters']
+    maxlength: [200, 'Legal awareness cannot exceed 200 characters']
   },
   phoneNumber: {
     type: String,

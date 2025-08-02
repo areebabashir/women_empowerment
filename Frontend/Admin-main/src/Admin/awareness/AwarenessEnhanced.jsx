@@ -382,13 +382,13 @@ const AwarenessEnhanced = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Service Available *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Legal Awareness *</label>
                   <input
                     type="text"
                     value={formData.serviceAvailable}
                     onChange={(e) => setFormData({...formData, serviceAvailable: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter service available"
+                    placeholder="Enter legal awareness information"
                     required
                   />
                 </div>

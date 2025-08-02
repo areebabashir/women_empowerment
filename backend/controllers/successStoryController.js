@@ -27,15 +27,20 @@ export const addStory = async (req, res) => {
 export const getStoryById = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('🔍 Fetching story with ID:', id);
+    
     const story = await SuccessStory.findById(id);
+    console.log('📖 Found story:', story);
     
     if (!story) {
+      console.log('❌ Story not found for ID:', id);
       return res.status(404).json({ success: false, message: 'Story not found.' });
     }
     
+    console.log('✅ Sending story response:', { success: true, story });
     res.status(200).json({ success: true, story });
   } catch (error) {
-    console.error('Get story error:', error);
+    console.error('❌ Get story error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -51,13 +51,29 @@ const StoryData = ({ storyData, currentPage, itemsPerPage, setStoryData, onAddSu
   };
 
   const handleView = async (storyId) => {
+    console.log('👁️ View button clicked for story ID:', storyId);
     try {
+      console.log('🌐 Making API call to:', `http://localhost:8000/api/successstories/getstory/${storyId}`);
       const response = await axios.get(`http://localhost:8000/api/successstories/getstory/${storyId}`);
-      setSelectedStory(response.data);
-      setShowModal(true);
+      console.log('📡 API Response:', response.data);
+      
+      if (response.data.success && response.data.story) {
+        console.log('✅ Setting selected story:', response.data.story);
+        setSelectedStory(response.data.story);
+        setShowModal(true);
+      } else {
+        console.error('❌ Invalid response format:', response.data);
+        // Fallback to local data
+        const story = storyData.find(s => s.id === storyId);
+        console.log('🔄 Using fallback story data:', story);
+        setSelectedStory(story);
+        setShowModal(true);
+      }
     } catch (error) {
-      console.error('Error fetching story details:', error);
+      console.error('❌ Error fetching story details:', error);
+      // Fallback to local data
       const story = storyData.find(s => s.id === storyId);
+      console.log('🔄 Using fallback story data due to error:', story);
       setSelectedStory(story);
       setShowModal(true);
     }
@@ -124,14 +140,28 @@ const StoryData = ({ storyData, currentPage, itemsPerPage, setStoryData, onAddSu
       </div>
 
       {/* Story Detail Modal */}
+      {console.log('🎭 Modal state - showModal:', showModal, 'selectedStory:', selectedStory)}
       {showModal && selectedStory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              console.log('❌ Closing modal from backdrop click');
+              setShowModal(false);
+              setSelectedStory(null);
+            }
+          }}
+        >
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Success Story Details</h2>
                 <button 
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    console.log('❌ Closing modal');
+                    setShowModal(false);
+                    setSelectedStory(null);
+                  }}
                   className="text-gray-400 hover:text-gray-700 text-2xl"
                 >
                   &times;
@@ -156,6 +186,7 @@ const StoryData = ({ storyData, currentPage, itemsPerPage, setStoryData, onAddSu
                 </div>
 
                 <div className="flex-grow">
+                  {console.log('📋 Rendering story details:', selectedStory)}
                   <div className="mb-6">
                     <h3 className="text-xl font-semibold text-gray-800">{selectedStory.name}</h3>
                     <p className="text-indigo-600 font-medium">{selectedStory.position}</p>
@@ -195,7 +226,11 @@ const StoryData = ({ storyData, currentPage, itemsPerPage, setStoryData, onAddSu
 
               <div className="mt-6 flex justify-end">
                 <button
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    console.log('❌ Closing modal from bottom button');
+                    setShowModal(false);
+                    setSelectedStory(null);
+                  }}
                   className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   Close
@@ -285,7 +320,6 @@ const AddStoryModal = ({ show, onClose, onAddSuccess }) => {
 const SuccessStories = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [storyData, setStoryData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState("newest");
@@ -322,15 +356,6 @@ const SuccessStories = () => {
     fetchStories();
   }, []);
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
-
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };
@@ -351,14 +376,8 @@ const SuccessStories = () => {
     }
   };
 
-  const filteredStories = storyData.filter(story =>
-    story.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    story.position?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    story.story?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const sortedAndFilteredStories = sortStories(filteredStories);
-  const totalPages = Math.ceil(sortedAndFilteredStories.length / itemsPerPage);
+  const sortedStories = sortStories(storyData);
+  const totalPages = Math.ceil(sortedStories.length / itemsPerPage);
 
   const handleAdd = () => {
     setShowAddModal(true);
@@ -378,30 +397,10 @@ const SuccessStories = () => {
           </button>
         </div>
         <AddStoryModal show={showAddModal} onClose={() => setShowAddModal(false)} onAddSuccess={fetchStories} />
-        {/* Search and Filter */}
+        
+        {/* Sort Filter */}
         <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search success stories..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="pl-10 pr-10 py-2 w-full border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="text-gray-400" />
-                </button>
-              )}
-            </div>
-
             <select
               value={sortOption}
               onChange={handleSortChange}
@@ -435,7 +434,7 @@ const SuccessStories = () => {
               Retry
             </button>
           </div>
-        ) : sortedAndFilteredStories.length === 0 ? (
+        ) : sortedStories.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
             <div className="text-gray-400 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -443,24 +442,22 @@ const SuccessStories = () => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-700 mb-1">
-              {searchQuery ? 'No matching stories found' : 'No success stories available'}
+              No success stories available
             </h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery ? 'Try a different search term' : 'Add your first success story to get started'}
+              Add your first success story to get started
             </p>
-            {!searchQuery && (
-              <button
-                onClick={handleAdd}
-                className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm"
-              >
-                Add Success Story
-              </button>
-            )}
+            <button
+              onClick={handleAdd}
+              className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg text-sm"
+            >
+              Add Success Story
+            </button>
           </div>
         ) : (
           <>
             <StoryData
-              storyData={sortedAndFilteredStories}
+              storyData={sortedStories}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               setStoryData={setStoryData}

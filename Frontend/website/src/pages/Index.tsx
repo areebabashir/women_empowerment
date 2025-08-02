@@ -33,6 +33,8 @@ import { apiCall } from "@/api/apiCall";
 import toast from "react-hot-toast";
 import { getImageUrl } from "@/utils/imageUtils";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
 const Index = () => {
 
 
@@ -337,7 +339,7 @@ const Index = () => {
                   <a href="/contact"> Contact Us</a>
                 </Button>
                 <Button variant="donate" size="lg" className="text-lg px-8 py-6 bg-white/10 border-white/30 text-white hover:bg-white/20" onClick={handleAboutClick}>
-                  <a href="/about"> Our Mission</a>
+                  <a href="/about"> About Us</a>
                 </Button>
               </div>
             </div>
@@ -416,35 +418,7 @@ const Index = () => {
 
       <div className="h-1 w-full bg-gradient-to-r from-primary to-soft-purple rounded-full"></div>
 
-      {/* Impact Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-              Our Impact
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Together, we're creating measurable change in women's lives around the world.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {impactStats.map((stat, index) => (
-              <Card key={index} className="text-center bg-background/80 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300">
-                <CardContent className="p-8">
-                  <div className={`w-16 h-16 bg-gradient-to-br from-primary to-soft-purple rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
-                    {stat.icon}
-                  </div>
-                  <div className={`text-4xl font-bold mb-2 ${stat.color}`}>
-                    {stat.number.toLocaleString()}{stat.suffix}
-                  </div>
-                  <p className="text-muted-foreground font-medium">{stat.label}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+      
 
       {/* Success Stories - Infinite Moving Carousel */}
       <section className="py-20 bg-background">
@@ -508,7 +482,35 @@ const Index = () => {
           )}
         </div>
       </section>
+{/* Impact Section */}
+      <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              Our Impact
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Together, we're creating measurable change in women's lives around the world.
+            </p>
+          </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {impactStats.map((stat, index) => (
+              <Card key={index} className="text-center bg-background/80 backdrop-blur-sm border-border/50 hover:shadow-lg transition-all duration-300">
+                <CardContent className="p-8">
+                  <div className={`w-16 h-16 bg-gradient-to-br from-primary to-soft-purple rounded-2xl flex items-center justify-center mx-auto mb-6 text-white`}>
+                    {stat.icon}
+                  </div>
+                  <div className={`text-4xl font-bold mb-2 ${stat.color}`}>
+                    {stat.number.toLocaleString()}{stat.suffix}
+                  </div>
+                  <p className="text-muted-foreground font-medium">{stat.label}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
       <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -579,6 +581,29 @@ const Index = () => {
           )}
         </div>
       </section>
+      <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
+              Want to be part of something bigger?
+            </h2>
+            <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
+              Join thousands of supporters who are making a real difference in women's lives worldwide.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+              {!isAuthenticated() &&
+              <Button variant="donate" size="lg" className="text-lg px-8 py-6" onClick={handleJoinUsClick}>
+                <a href="/join-us">Join Us</a>
+              </Button>
+              }
+              <Button variant="empowerment" size="lg" className="text-lg px-8 py-6" onClick={handleContactClick}>
+                <a href="/contact">Contact Us</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Our Partners - Infinite Logo Slider */}
       <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
@@ -612,30 +637,7 @@ const Index = () => {
         </div>
       </section>
       {/* Join the Movement CTA */}
-      <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-6">
-              Want to be part of something bigger?
-            </h2>
-            <p className="text-xl text-muted-foreground mb-10 leading-relaxed">
-              Join thousands of supporters who are making a real difference in women's lives worldwide.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              {!isAuthenticated() &&
-              <Button variant="donate" size="lg" className="text-lg px-8 py-6" onClick={handleJoinUsClick}>
-                <a href="/join-us">Join Us</a>
-              </Button>
-              }
-              <Button variant="empowerment" size="lg" className="text-lg px-8 py-6" onClick={handleContactClick}>
-                <a href="/contact">Contact Us</a>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
-
+    
       {/* Success Story Modal */}
       {showModal && activeStory && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">

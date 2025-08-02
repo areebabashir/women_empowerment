@@ -32,10 +32,17 @@ export const addTeamMember = async (req, res) => {
     const { name, position, bio } = req.body;
     
     // Validate required fields
-    if (!name || !position) {
+    if (!name || !name.trim()) {
       return res.status(400).json({ 
         success: false, 
-        message: "Name and position are required" 
+        message: "Name is required" 
+      });
+    }
+    
+    if (!position || !position.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Position is required" 
       });
     }
     
@@ -51,16 +58,20 @@ export const addTeamMember = async (req, res) => {
     }
     
     const newTeam = new Team({ 
-      name, 
-      position, 
+      name: name.trim(), 
+      position: position.trim(), 
       pic, 
-      bio: bio || '' 
+      bio: bio ? bio.trim() : '' 
     });
     
     await newTeam.save();
     
     console.log('Team member created successfully:', newTeam);
-    res.status(201).json({ success: true, team: newTeam });
+    res.status(201).json({ 
+      success: true, 
+      message: "Team member added successfully",
+      team: newTeam 
+    });
   } catch (error) {
     console.error('Team creation error:', error);
     
@@ -74,7 +85,18 @@ export const addTeamMember = async (req, res) => {
       });
     }
     
-    res.status(500).json({ success: false, message: error.message });
+    // Handle duplicate key errors
+    if (error.code === 11000) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "A team member with this name already exists" 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: "Internal server error. Please try again later." 
+    });
   }
 };
 

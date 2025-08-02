@@ -210,9 +210,9 @@ const AddAwarenessModal = ({ showModal, setShowModal, onAwarenessAdded }) => {
               />
             </div>
 
-            {/* Service Available Field */}
+            {/* Legal Awareness Field */}
             <div className="flex flex-col">
-              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Service Available*</label>
+              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Legal Awareness*</label>
               <input
                 type="text"
                 id="serviceAvailable"
@@ -221,7 +221,7 @@ const AddAwarenessModal = ({ showModal, setShowModal, onAwarenessAdded }) => {
                 onChange={handleChange}
                 required
                 className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
-                placeholder="Enter available services"
+                placeholder="Enter legal awareness information"
               />
             </div>
 
@@ -344,7 +344,7 @@ const UpdateAwarenessModal = ({ showModal, setShowModal, item, onAwarenessUpdate
     
     // Validate required fields
     if (!formData.name.trim() || !formData.description.trim() || !formData.serviceAvailable.trim() || !formData.phoneNumber.trim() || !formData.emergencyNumber.trim()) {
-      Swal.fire('Error', 'Name, Description, Service Available, Phone Number, and Emergency Number are required fields', 'error');
+      Swal.fire('Error', 'Name, Description, Legal Awareness, Phone Number, and Emergency Number are required fields', 'error');
       return;
     }
     
@@ -464,9 +464,9 @@ const UpdateAwarenessModal = ({ showModal, setShowModal, item, onAwarenessUpdate
               />
             </div>
 
-            {/* Service Available Field */}
+            {/* Legal Awareness Field */}
             <div className="flex flex-col">
-              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Service Available*</label>
+              <label htmlFor="serviceAvailable" className="text-sm font-medium text-gray-700 mb-1">Legal Awareness*</label>
               <input
                 type="text"
                 id="serviceAvailable"
@@ -475,7 +475,7 @@ const UpdateAwarenessModal = ({ showModal, setShowModal, item, onAwarenessUpdate
                 onChange={handleChange}
                 required
                 className="border rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
-                placeholder="Enter available services"
+                placeholder="Enter legal awareness information"
               />
             </div>
 
@@ -749,7 +749,7 @@ const AwarenessData = ({ awarenessData, currentPage, itemsPerPage, setAwarenessD
                   </div>
 
                   <div className="mt-6">
-                    <h4 className="text-lg font-medium text-gray-800 mb-2">Service Available</h4>
+                    <h4 className="text-lg font-medium text-gray-800 mb-2">Legal Awareness</h4>
                     <p className="text-gray-600">{selectedItem.serviceAvailable}</p>
                   </div>
 
@@ -795,7 +795,6 @@ const AwarenessData = ({ awarenessData, currentPage, itemsPerPage, setAwarenessD
 const Awareness = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [awarenessData, setAwarenessData] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [sortOption, setSortOption] = useState("newest");
@@ -860,15 +859,6 @@ const Awareness = () => {
     fetchAwareness();
   }, []);
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
-
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
   };
@@ -889,13 +879,8 @@ const Awareness = () => {
     }
   };
 
-  const filteredAwareness = awarenessData.filter(item =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const sortedAndFilteredAwareness = sortAwareness(filteredAwareness);
-  const totalPages = Math.ceil(sortedAndFilteredAwareness.length / itemsPerPage);
+  const sortedAwareness = sortAwareness(awarenessData);
+  const totalPages = Math.ceil(sortedAwareness.length / itemsPerPage);
 
   const handleAwarenessAdded = () => {
     fetchAwareness(); // refresh the list
@@ -915,30 +900,9 @@ const Awareness = () => {
           </button>
         </div>
 
-        {/* Search and Filter */}
+        {/* Sort Filter */}
         <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search awareness items..."
-                value={searchQuery}
-                onChange={handleSearch}
-                className="pl-10 pr-10 py-2 w-full border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none"
-              />
-              {searchQuery && (
-                <button
-                  onClick={clearSearch}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center hover:text-gray-600"
-                >
-                  <FontAwesomeIcon icon={faTimes} className="text-gray-400" />
-                </button>
-              )}
-            </div>
-
             <select
               value={sortOption}
               onChange={handleSortChange}
@@ -972,7 +936,7 @@ const Awareness = () => {
               Retry
             </button>
           </div>
-        ) : sortedAndFilteredAwareness.length === 0 ? (
+        ) : sortedAwareness.length === 0 ? (
           <div className="bg-white p-8 rounded-lg shadow-sm border text-center">
             <div className="text-gray-400 mb-4">
               <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -980,24 +944,22 @@ const Awareness = () => {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-700 mb-1">
-              {searchQuery ? 'No matching awareness items found' : 'No awareness items available'}
+              No awareness items available
             </h3>
             <p className="text-gray-500 mb-4">
-              {searchQuery ? 'Try a different search term' : 'Add your first awareness item to get started'}
+              Add your first awareness item to get started
             </p>
-            {!searchQuery && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm"
-              >
-                Add Awareness Item
-              </button>
-            )}
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-block bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg text-sm"
+            >
+              Add Awareness Item
+            </button>
           </div>
         ) : (
           <>
             <AwarenessData
-              awarenessData={sortedAndFilteredAwareness}
+              awarenessData={sortedAwareness}
               currentPage={currentPage}
               itemsPerPage={itemsPerPage}
               setAwarenessData={setAwarenessData}
