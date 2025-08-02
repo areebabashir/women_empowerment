@@ -56,6 +56,7 @@ export const isCompany = (req, res, next) => {
   }
   
   if (req.user.role !== 'company') {
+    console.log("iscompany not passed ")
     return res.status(403).json({ msg: 'Company access only' });
   }
   next();

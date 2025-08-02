@@ -31,6 +31,7 @@ import AddPodcast from "./Admin/podcast/AddPodcast";
 import UpdatePodcast from "./Admin/podcast/UpdatePodcast";
 import EventParticipants from "./Admin/event/EventParticipants";
 import ProgramParticipants from "./Admin/program/ProgramParticipants";
+import Jobs from "./Admin/Jobs/jobs.jsx";
 import AwarenessEnhanced from "./Admin/awareness/AwarenessEnhanced";
 
 import Donations from "./Admin/Donation/Donation.jsx";
@@ -56,6 +57,7 @@ function App() {
         <Route path="/Admin/Event/New" element={<ProtectedRoute><AddEventpage /></ProtectedRoute>} />
         <Route path="/Admin/Event/Update/:id" element={<ProtectedRoute><UpdateEvent /></ProtectedRoute>} />
         <Route path="/Admin/Users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+        <Route path="/Admin/Jobs" element={<ProtectedRoute><Jobs /></ProtectedRoute>} />
         <Route path="/Admin/Accounts" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
         <Route path="/Admin/Donations" element={<ProtectedRoute><Donations /></ProtectedRoute>} />
 

@@ -31,6 +31,17 @@ export interface Program {
   image: string;
   participants: string[];
 }
+export interface Job {
+  _id: string;
+  position: string;
+  jobLink:string;
+  description: string;
+  workMode: string;
+  psotedAt:String
+
+  companyName: string;
+  companyEmail: string;
+}
 
 export interface Donation {
   campaign: string;
@@ -68,4 +79,4 @@ export interface ApiCallOptions {
   requiresAuth?: boolean;
 }
 
-export type TabType = 'dashboard' | 'profile' | 'courses' |'events' | 'programs' | 'donations';
+export type TabType = 'dashboard' | 'profile' | 'courses' |'events' | 'programs' | 'donations' | 'jobs';

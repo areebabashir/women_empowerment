@@ -5,6 +5,7 @@ import Dashboard from "../components/userdashboard/Dashboard";
 import TraineeDashboard from "../components/userdashboard/TraineeDashboard";
 import CompanyDashboard from "../components/userdashboard/CompanyDashboard";
 import CompanyPrograms from "../components/userdashboard/CompanyPrograms";
+import CompanyJobs from "../components/userdashboard/CompanyJobs";
 import Profile from "../components/userdashboard/Profile";
 import Events from "../components/userdashboard/Events";
 import Programs from "../components/userdashboard/Programs";
@@ -169,6 +170,9 @@ const UserDashboard: React.FC = () => {
       switch (activeTab) {
         case 'dashboard':
           return <CompanyDashboard user={user} />;
+          case 'jobs':
+            return <CompanyJobs user={user} />;
+
         case 'profile':
           return user ? <Profile user={user} setUser={setUser}/> : <p>No user data available</p>;
         case 'courses':

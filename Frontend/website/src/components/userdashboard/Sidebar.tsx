@@ -6,7 +6,8 @@ import {
   Heart,
   LayoutDashboard,
   LogOut,
-  LucideIcon
+  LucideIcon,
+  BriefcaseBusiness 
 } from 'lucide-react';
 import { User as UserType, TabType } from "../../types";
 import NavbarProfileAvatar from '../NavbarProfileAvatar';
@@ -38,6 +39,7 @@ const allMenuItems: MenuItem[] = [
   { id: 'programs', label: 'My Programs', icon: BookOpen },
   { id: 'courses', label: 'Courses', icon: BookOpen },
   { id: 'donations', label: 'My Donations', icon: Heart },
+  { id: 'jobs', label: 'My Jobs', icon: BriefcaseBusiness },
 ];
 
 // Role-based filtering
@@ -46,7 +48,7 @@ const getVisibleTabsForRole = (role: string): TabType[] => {
     case 'donor':
       return [ 'profile', "donations"]; // hide events, programs, courses
     case 'company':
-      return ['dashboard', 'profile', 'courses','donations']; // hide events, programs, donations
+      return ['dashboard', 'profile', 'courses','donations' , 'jobs']; // hide events, programs, donations
     case 'ngo':
       return ['dashboard', 'profile', 'donations']; // only show dashboard, donations, profile
     case 'member':
