@@ -170,7 +170,7 @@ const UserDashboard: React.FC = () => {
         case 'dashboard':
           return <CompanyDashboard user={user} />;
         case 'profile':
-          return user ? <Profile user={user} /> : <p>No user data available</p>;
+          return user ? <Profile user={user} setUser={setUser}/> : <p>No user data available</p>;
         case 'courses':
           return <CompanyPrograms user={user} />;
         case 'donations':
@@ -186,7 +186,7 @@ const UserDashboard: React.FC = () => {
         case 'dashboard':
           return <TraineeDashboard events={userEvents} programs={userPrograms} />;
         case 'profile':
-          return user ? <Profile user={user} /> : <p>No user data available</p>;
+          return user ? <Profile user={user} setUser={setUser}/> : <p>No user data available</p>;
         case 'events':
           return <Events events={userEvents} />;
         case 'programs':
@@ -202,7 +202,7 @@ const UserDashboard: React.FC = () => {
         case 'dashboard':
           return <Dashboard user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
         case 'profile':
-          return user ? <Profile user={user} /> : <p>No user data available</p>;
+          return user ? <Profile user={user} setUser={setUser}/> : <p>No user data available</p>;
         case 'events':
           return <Events events={userEvents} />;
         case 'programs':
@@ -219,7 +219,7 @@ const UserDashboard: React.FC = () => {
       case 'dashboard':
         return <Dashboard  isngo={(user?.role =="ngo")} user={user} events={userEvents} programs={userPrograms} donations={userDonations} />;
       case 'profile':
-        return user ? <Profile user={user} /> : <p>No user data available</p>;
+        return user ? <Profile user={user} setUser={setUser}/> : <p>No user data available</p>;
       case 'events':
         return <Events events={userEvents} />;
       case 'programs':

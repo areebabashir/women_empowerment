@@ -167,62 +167,64 @@ const Donations = () => {
     }
   };
 
-  const DonationCard = ({ donation, showActions = true }) => (
-    <div className="bg-white p-6 rounded-lg shadow-md border hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-800">{donation.user?.name || 'Anonymous'}</h3>
-          <p className="text-sm text-gray-600">{donation.user?.email}</p>
-        </div>
-        {getStatusBadge(donation)}
-      </div>
-      
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <p className="text-sm text-gray-600">Amount</p>
-          <p className="font-semibold text-lg text-green-600">{formatAmount(donation.amount)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Date</p>
-          <p className="font-medium">{formatDate(donation.date)}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Method</p>
-          <p className="font-medium capitalize">{donation.method}</p>
-        </div>
-        <div>
-          <p className="text-sm text-gray-600">Campaign</p>
-          <p className="font-medium">{donation.campaign}</p>
-        </div>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <button
-          onClick={() => viewDonationDetails(donation._id)}
-          className="text-indigo-600 hover:text-indigo-800 font-medium text-sm"
-        >
-          View Details
-        </button>
-        
-        {showActions && !donation.approved && !donation.rejected && (
-          <div className="flex space-x-2">
-            <button
-              onClick={() => approveDonation(donation._id)}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
-            >
-              Approve
-            </button>
-            <button
-              onClick={() => rejectDonation(donation._id)}
-              className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
-            >
-              Reject
-            </button>
+  const DonationListItem = ({ donation, showActions = true }) => (
+    <div className="bg-white border-b border-gray-200 hover:bg-gray-50 transition-colors">
+      <div className="px-6 py-4">
+        <div className="flex items-center">
+          {/* Donor Information */}
+          <div className="flex-1">
+            <div className="text-lg font-semibold text-gray-900">{donation.user?.name || 'Anonymous'}</div>
+            <div className="text-sm text-gray-500">{donation.user?.email}</div>
           </div>
-        )}
+          
+          {/* Amount & Date */}
+          <div className="flex-1">
+            <div className="text-2xl font-bold text-green-600">{formatAmount(donation.amount)}</div>
+            <div className="text-sm text-gray-500">{formatDate(donation.date)}</div>
+          </div>
+          
+          {/* Method & Campaign */}
+          <div className="flex-1">
+            <div className="font-medium capitalize text-gray-900">{donation.method}</div>
+            <div className="text-sm text-gray-500 truncate">{donation.campaign}</div>
+          </div>
+          
+          {/* Status */}
+          <div className="flex-1">
+            {getStatusBadge(donation)}
+          </div>
+          
+          {/* Actions */}
+          <div className="flex-1 flex justify-end items-center space-x-3">
+            <button
+              onClick={() => viewDonationDetails(donation._id)}
+              className="text-indigo-600 hover:text-indigo-800 font-medium text-sm px-3 py-1 rounded-md hover:bg-indigo-50"
+            >
+              View Details
+            </button>
+            
+            {showActions && !donation.approved && !donation.rejected && (
+              <>
+                <button
+                  onClick={() => approveDonation(donation._id)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm"
+                >
+                  Approve
+                </button>
+                <button
+                  onClick={() => rejectDonation(donation._id)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm"
+                >
+                  Reject
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
+
 
   const Modal = ({ donation, onClose }) => (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -366,24 +368,36 @@ const Donations = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            {/* Table Header */}
+            <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+              <div className="flex items-center text-xs font-medium text-gray-500 uppercase tracking-wide">
+                <div className="flex-1">Donor Information</div>
+                <div className="flex-1">Amount & Date</div>
+                <div className="flex-1">Method & Campaign</div>
+                <div className="flex-1">Status</div>
+                <div className="flex-1 text-right">Actions</div>
+              </div>
+            </div>
+            
+            {/* List Items */}
             {activeTab === 'all' ? (
               donations.length > 0 ? (
                 donations.map((donation) => (
-                  <DonationCard key={donation._id} donation={donation} />
+                  <DonationListItem key={donation._id} donation={donation} />
                 ))
               ) : (
-                <div className="col-span-full text-center py-12">
+                <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No donations found</p>
                 </div>
               )
             ) : (
               unapprovedDonations.length > 0 ? (
                 unapprovedDonations.map((donation) => (
-                  <DonationCard key={donation._id} donation={donation} />
+                  <DonationListItem key={donation._id} donation={donation} />
                 ))
               ) : (
-                <div className="col-span-full text-center py-12">
+                <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">No pending donations</p>
                 </div>
               )

@@ -27,12 +27,47 @@ import "keen-slider/keen-slider.min.css";
 import heroImage from "@/assets/hero-empowered-women.jpg";
 import supportImage from "@/assets/women-supporting-each-other.jpg";
 import successStoryImage from "@/assets/success-story-woman.jpg";
-import { useEffect, useState, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { getAllSuccessStories, getAllAwareness } from "@/services/api";
+import { apiCall } from "@/api/apiCall";
 import toast from "react-hot-toast";
 import { getImageUrl } from "@/utils/imageUtils";
 
 const Index = () => {
+
+
+  const [partnerLogos, setPartnerLogos] = useState<string[]>([]);
+  const [successStories, setSuccessStories] = useState([]);
+  const [loadingStories, setLoadingStories] = useState(true);
+  const [errorStories, setErrorStories] = useState(null);
+  const [scrollIndex, setScrollIndex] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+  const [activeStory, setActiveStory] = useState(null);
+  const [showLegalModal, setShowLegalModal] = useState(false);
+  const [activeLegalInfo, setActiveLegalInfo] = useState(null);
+  const [awarenessData, setAwarenessData] = useState([]);
+  const [loadingAwareness, setLoadingAwareness] = useState(true);
+  const [errorAwareness, setErrorAwareness] = useState(null);
+
+
+  useEffect(() => {
+    const fetchLogos = async () => {
+      const response = await apiCall<string[]>({
+        url: `${API_BASE_URL}/partner-logos`,
+        method: 'GET',
+      });
+
+      if (response.success) {
+        console.log(partnerLogos)
+        setPartnerLogos(response.data);
+      } else {
+        console.error('Failed to fetch partner logos:', response.data);
+      }
+    };
+
+    fetchLogos();
+  }, []);
+
   const [impactCounts, setImpactCounts] = useState({
     women: 0,
     villages: 0,
@@ -88,17 +123,6 @@ const Index = () => {
     },
   });
 
-  const [successStories, setSuccessStories] = useState([]);
-  const [loadingStories, setLoadingStories] = useState(true);
-  const [errorStories, setErrorStories] = useState(null);
-  const [scrollIndex, setScrollIndex] = useState(0);
-  const [showModal, setShowModal] = useState(false);
-  const [activeStory, setActiveStory] = useState(null);
-  const [showLegalModal, setShowLegalModal] = useState(false);
-  const [activeLegalInfo, setActiveLegalInfo] = useState(null);
-  const [awarenessData, setAwarenessData] = useState([]);
-  const [loadingAwareness, setLoadingAwareness] = useState(true);
-  const [errorAwareness, setErrorAwareness] = useState(null);
 
   useEffect(() => {
     scrollTo(0,0)
@@ -200,62 +224,6 @@ const Index = () => {
   // Convert API data to frontend format
   const awarenessCards = awarenessData.map(convertAwarenessToFrontendFormat);
 
-  const partnerLogos = [
-    {
-      name: "Women's Foundation",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <rect width="100" height="40" rx="5" fill="#8b5cf6" />
-          <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="white" textAnchor="middle">WOMEN'S FOUNDATION</text>
-        </svg>
-      )
-    },
-    {
-      name: "Global Empowerment",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <circle cx="20" cy="20" r="15" fill="#ec4899" />
-          <text x="50" y="25" fontFamily="Arial" fontSize="14" fill="#ec4899" textAnchor="middle">GLOBAL EMPOWER</text>
-        </svg>
-      )
-    },
-    {
-      name: "Equal Rights Initiative",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <path d="M0,20 L100,20 M50,0 L50,40" stroke="#3b82f6" strokeWidth="3" />
-          <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#3b82f6" textAnchor="middle">EQUAL RIGHTS</text>
-        </svg>
-      )
-    },
-    {
-      name: "Education First",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <polygon points="50,0 100,40 0,40" fill="#10b981" />
-          <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="white" textAnchor="middle">EDU FIRST</text>
-        </svg>
-      )
-    },
-    {
-      name: "Health & Wellness",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <rect x="30" y="10" width="40" height="20" rx="5" fill="#ef4444" />
-          <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#ef4444" textAnchor="middle">HEALTH+</text>
-        </svg>
-      )
-    },
-    {
-      name: "Future Leaders",
-      component: (
-        <svg viewBox="0 0 100 40" className="h-12 w-auto">
-          <path d="M20,40 Q50,0 80,40" fill="none" stroke="#f59e0b" strokeWidth="3" />
-          <text x="50" y="30" fontFamily="Arial" fontSize="12" fill="#f59e0b" textAnchor="middle">FUTURE LEADERS</text>
-        </svg>
-      )
-    }
-  ];
 
   const programs = [
     {
@@ -489,7 +457,7 @@ const Index = () => {
               Real women, real impact, real change.
             </p>
           </div>
-          
+
           {loadingStories ? (
             <div className="text-center py-10">Loading success stories...</div>
           ) : errorStories ? (
@@ -500,8 +468,8 @@ const Index = () => {
               <div className="flex w-max animate-scroll-slow">
                 {[...successStories, ...successStories].map((story, index) => (
                   <div key={`${story.id}-${index}`} className="px-4 w-[350px]">
-                    <Card 
-                      className="border-border/50 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full cursor-pointer"
+                    <Card
+                      className="border-border/50 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full"
                       onClick={() => {
                         setActiveStory(story);
                         setShowModal(true);
@@ -536,16 +504,15 @@ const Index = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-10">No success stories available.</div>
+            <div className="text-center py-10">No awareness resources available.</div>
           )}
         </div>
       </section>
 
-      {/* Legal Awareness - Infinite Moving Carousel */}
       <section className="py-20 bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/20 dark:to-pink-950/20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20  bg-gradient-to-r from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-primary to-soft-purple rounded-full mb-3 shadow-2xl">
               <AlertTriangle className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
@@ -566,29 +533,29 @@ const Index = () => {
               <div className="flex w-max animate-scroll-slow">
                 {[...awarenessCards, ...awarenessCards].map((card, index) => (
                   <div key={`${card.id}-${index}`} className="px-4 w-[320px]">
-                    <Card 
+                    <Card
                       className="group hover:shadow-2xl transition-all duration-300 bg-background/90 backdrop-blur-sm border-border/50 cursor-pointer h-full hover:scale-[1.02]"
                       onClick={() => handleLegalInfoClick(card)}
                     >
                       <CardContent className="p-6 h-full flex flex-col">
-                        <div className={`w-16 h-16  bg-gradient-to-r from-primary to-soft-purple rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300`}>
+                        <div className="w-16 h-16 bg-gradient-to-r from-primary to-soft-purple rounded-2xl flex items-center justify-center mb-6 text-white group-hover:scale-110 transition-transform duration-300">
                           {card.icon}
                         </div>
-                        
-                        <h3 className="text-xl font-bold text-foreground mb-2">{card.title}</h3>
-                        <p className="text-lg font-semibold text-primary mb-2">{card.name}</p>
-                        
-                     
+
+                        <h3 className="text-xl font-bold text-foreground mb-2">
+                          {card.title}
+                        </h3>
+                        <p className="text-lg font-semibold text-primary mb-2">
+                          {card.name}
+                        </p>
 
                         <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-grow">
                           {card.description}
                         </p>
 
                         <div className="flex gap-2 mt-auto">
-                         
-                          
-                          <Button 
-                            variant="outline" 
+                          <Button
+                            variant="outline"
                             size="sm"
                             className="flex-1"
                             onClick={(e) => {
@@ -606,11 +573,44 @@ const Index = () => {
               </div>
             </div>
           ) : (
-            <div className="text-center py-10">No awareness resources available.</div>
+            <div className="text-center py-10">
+              No awareness resources available.
+            </div>
           )}
         </div>
       </section>
 
+      {/* Our Partners - Infinite Logo Slider */}
+      <section className="py-16 bg-gray-50 dark:bg-gray-900/50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Our Trusted Partners
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Collaborating with leading organizations to empower women worldwide
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden py-6">
+            <div className="flex w-max animate-scroll-slow items-center">
+              {/* Double the array for seamless looping */}
+              {[...partnerLogos, ...partnerLogos].map((logo, index) => (
+                <div
+                  key={index}
+                  className="px-8 flex items-center justify-center"
+                  style={{ minWidth: '200px' }}
+                >
+                  <div className="grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100">
+                    <img key={index} src={`${API_BASE_URL}${logo}`} alt={`Partner ${index}`} className="w-32 h-auto" />
+
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
       {/* Join the Movement CTA */}
       <section className="py-20 bg-gradient-to-br from-primary/5 to-soft-purple/5">
         <div className="container mx-auto px-4">
@@ -673,7 +673,7 @@ const Index = () => {
         </div>
       )}
 
-      {/* Legal Awareness Modal */}
+      {/* Awareness Modal */}
       {showLegalModal && activeLegalInfo && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4">
           <div className="bg-white max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl relative max-h-[90vh] overflow-y-auto">

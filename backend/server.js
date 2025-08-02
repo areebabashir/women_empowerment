@@ -15,8 +15,6 @@ import donationRoute from "./routes/donationRoute.js"
 import awarenessRoute from './routes/awarenessRoute.js';
 import fs from 'fs';
 
-
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 
