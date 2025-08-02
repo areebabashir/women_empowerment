@@ -3,7 +3,7 @@ import User from '../models/userModel.js';
 
 export const createJob = async (req, res) => {
   try {
-    const { position, jobLink, description, workMode } = req.body;
+    const { position, jobLink, description,location, workMode } = req.body;
     const companyId = req.user._id;
 
     const company = await User.findById(companyId);
@@ -15,6 +15,7 @@ export const createJob = async (req, res) => {
       position,
       jobLink,
       description,
+      location,
       workMode,
       company: company._id,
       companyName: company.name,
@@ -34,7 +35,7 @@ export const updateJob = async (req, res) => {
     const updates = req.body;
 
     // Only allow updating these fields
-    const allowedFields = ['position', 'jobLink', 'description', 'workMode'];
+    const allowedFields = ['position', 'jobLink', 'description','location' ,'workMode'];
     const filteredUpdates = {};
     allowedFields.forEach(field => {
       if (updates[field]) filteredUpdates[field] = updates[field];

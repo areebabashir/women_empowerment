@@ -114,18 +114,25 @@ const Jobs = () => {
         {/* Job Type */}
         <div className="col-span-2">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+            <i className="fas fa-location mr-1"></i>
+            {job.location}
+          </span>
+        </div>
+        {/* Job Type */}
+        <div className="col-span-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
             <i className="fas fa-briefcase mr-1"></i>
             {job.workMode}
           </span>
         </div>
 
         {/* Posted Date */}
-        <div className="col-span-2">
+        {/* <div className="col-span-2">
           <div className="flex items-center text-sm text-gray-500">
             <i className="fas fa-calendar-alt mr-2"></i>
             <span>{formatDate(job.postedAt)}</span>
           </div>
-        </div>
+        </div> */}
 
         {/* Actions */}
         <div className="col-span-1 flex justify-end space-x-2">
@@ -197,7 +204,13 @@ const Jobs = () => {
                   <div className="flex items-center">
                     <i className="fas fa-briefcase w-5 text-gray-500 mr-3"></i>
                     <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-                      {selectedJob.jobType}
+                      {selectedJob.workMode}
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <i className="fas fa-location w-5 text-gray-500 mr-3"></i>
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      {selectedJob.location}
                     </span>
                   </div>
                   <div className="flex items-center">
@@ -286,12 +299,16 @@ const Jobs = () => {
               </div>
               <div className="col-span-2 flex items-center">
                 <i className="fas fa-tag mr-2"></i>
-                Type
+                Location
               </div>
               <div className="col-span-2 flex items-center">
+                <i className="fas fa-tag mr-2"></i>
+                Type
+              </div>
+              {/* <div className="col-span-2 flex items-center">
                 <i className="fas fa-calendar mr-2"></i>
                 Posted
-              </div>
+              </div> */}
               <div className="col-span-1 flex items-center justify-end">
                 <i className="fas fa-cog mr-2"></i>
                 Actions

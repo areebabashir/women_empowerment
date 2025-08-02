@@ -35,9 +35,10 @@ export interface Job {
   _id: string;
   position: string;
   jobLink:string;
+  location:string;
   description: string;
   workMode: string;
-  psotedAt:String
+  postedAt:String
 
   companyName: string;
   companyEmail: string;

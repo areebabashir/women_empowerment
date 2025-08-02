@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Briefcase, Plus, Edit, Trash2, Search, ExternalLink, Building, X ,Mail } from "lucide-react";
+import { Briefcase, Plus, Edit, Trash2, Search, ExternalLink, Building, X ,Mail ,LocateIcon} from "lucide-react";
 import { apiCall } from "../../api/apiCall";
+import toast from "react-hot-toast";
+
 // import { Job } from "../../types";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -10,6 +12,7 @@ interface Job {
   position: string;
   jobLink: string;
   description: string;
+  location:string;
   workMode: string;
   company: string;  
   companyName: string;
@@ -107,14 +110,14 @@ const CompanyJobs: React.FC<CompanyJobsProps> = ({ user }) => {
       });
 
       if (response.success) {
-        alert('Job deleted successfully!');
+        toast.success('Job deleted successfully!');
         fetchCompanyJobs();
       } else {
-        alert('Failed to delete job');
+        toast.error('Failed to delete job');
       }
     } catch (error) {
       console.error('Error deleting job:', error);
-      alert('Error deleting job');
+      toast.error('Error deleting job');
     }
   };
 
@@ -125,7 +128,7 @@ const CompanyJobs: React.FC<CompanyJobsProps> = ({ user }) => {
 
   const filteredJobs = jobs.filter(job =>
     job.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    job.description.toLowerCase().includes(searchTerm.toLowerCase()) || job.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.workMode.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -186,6 +189,10 @@ const CompanyJobs: React.FC<CompanyJobsProps> = ({ user }) => {
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">{job.description}</p>
               
               <div className="space-y-2 mb-4">
+                <div className="flex items-center text-sm text-gray-500">
+                  <LocateIcon className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <span className="truncate">{job.location}</span>
+                </div>
                 <div className="flex items-center text-sm text-gray-500">
                   <Building className="w-4 h-4 mr-2 flex-shrink-0" />
                   <span className="truncate">{job.companyName}</span>
@@ -276,6 +283,7 @@ const CreateJobModal: React.FC<{
     position: "",
     jobLink: "",
     description: "",
+    location:"",
     workMode: "On-site"
   });
   const [loading, setLoading] = useState(false);
@@ -292,7 +300,7 @@ const CreateJobModal: React.FC<{
     e.preventDefault();
     
     if (!formData.position || !formData.description) {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
       return;
     }
 
@@ -307,7 +315,7 @@ const CreateJobModal: React.FC<{
       });
 
       if (response.success) {
-        alert('Job posted successfully!');
+        toast.success('Job posted successfully!');
         onSuccess();
         onClose();
         // Reset form
@@ -315,14 +323,15 @@ const CreateJobModal: React.FC<{
           position: "",
           jobLink: "",
           description: "",
+          location:"",
           workMode: "On-site"
         });
       } else {
-        alert('Failed to post job');
+        toast.error('Failed to post job');
       }
     } catch (error) {
       console.error('Error creating job:', error);
-      alert('Error posting job');
+      toast.error('Error posting job');
     } finally {
       setLoading(false);
     }
@@ -370,6 +379,20 @@ const CreateJobModal: React.FC<{
               value={formData.jobLink}
               onChange={handleInputChange}
               placeholder="https://example.com/job-application"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7F264B] focus:border-transparent"
+            />
+          </div>
+          {/* job location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Location *
+            </label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              placeholder="Enter job location"
+              required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7F264B] focus:border-transparent"
             />
           </div>
@@ -444,6 +467,7 @@ const UpdateJobModal: React.FC<{
     position: "",
     jobLink: "",
     description: "",
+    location:"",
     workMode: "On-site"
   });
   const [loading, setLoading] = useState(false);
@@ -453,6 +477,7 @@ const UpdateJobModal: React.FC<{
       setFormData({
         position: job.position,
         jobLink: job.jobLink || "",
+        location:job.location,
         description: job.description,
         workMode: job.workMode
       });
@@ -470,8 +495,8 @@ const UpdateJobModal: React.FC<{
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!job || !formData.position || !formData.description) {
-      alert('Please fill in all required fields');
+    if (!job || !formData.position ||!formData.location || !formData.description) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
@@ -483,6 +508,7 @@ const UpdateJobModal: React.FC<{
         position: formData.position,
         jobLink: formData.jobLink,
         description: formData.description,
+        location: formData.location,
         workMode: formData.workMode
       };
 
@@ -494,15 +520,15 @@ const UpdateJobModal: React.FC<{
       });
 
       if (response.success) {
-        alert('Job updated successfully!');
+        toast.success('Job updated successfully!');
         onSuccess();
         onClose();
       } else {
-        alert('Failed to update job');
+        toast.error('Failed to update job');
       }
     } catch (error) {
       console.error('Error updating job:', error);
-      alert('Error updating job');
+      toast.error('Error updating job');
     } finally {
       setLoading(false);
     }
@@ -550,6 +576,19 @@ const UpdateJobModal: React.FC<{
               value={formData.jobLink}
               onChange={handleInputChange}
               placeholder="https://example.com/job-application"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7F264B] focus:border-transparent"
+            />
+          </div>
+          {/* Job location */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Job Location
+            </label>
+            <input
+              name="location"
+              value={formData.location}
+              onChange={handleInputChange}
+              placeholder="Enter job Location"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7F264B] focus:border-transparent"
             />
           </div>
