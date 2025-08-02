@@ -54,8 +54,10 @@ const Header = ({ showNavItems = true }: HeaderProps) => {
       name: "Opportunities",
       dropdown: true,
       items: [
+        
         { name: "Programs", href: "/programs" },
         { name: "Events", href: "/events" },
+        { name: "Jobs", href: "/Jobs" },
       ],
     },
     { name: "Gallery", href: "/gallery" },
