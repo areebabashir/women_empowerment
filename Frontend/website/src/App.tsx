@@ -18,6 +18,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DonationForm from "./pages/DonationForm"
 import TermsConditions from "./pages/terms";
 import PrivacyPolicy from "./pages/privacy";
+import Jobs from "./pages/Jobs";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -83,6 +84,7 @@ const App = () => (
           <Route path="/podcasts" element={<Podcasts />} />
           <Route path="/join-us" element={<JoinUs />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/jobs" element={<Jobs />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<JoinUs />} />
           <Route path="/terms" element={<TermsConditions />} />

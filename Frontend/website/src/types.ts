@@ -51,6 +51,16 @@ export interface Donation {
  receiptUrl: string;
  approved: boolean;
 }
+export interface JobType {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  mode: 'remote' | 'onsite' | 'hybrid';
+  applyLink: string;
+  contactEmail: string;
+}
 
 export interface UserData {
   user: User;
@@ -79,4 +89,4 @@ export interface ApiCallOptions {
   requiresAuth?: boolean;
 }
 
-export type TabType = 'dashboard' | 'profile' | 'courses' |'events' | 'programs' | 'donations' | 'jobs';
+export type TabType = 'dashboard' | 'profile' | 'courses' |'events' | 'programs' | 'donations' | 'jobs' | 'jobType';
