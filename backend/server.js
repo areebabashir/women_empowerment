@@ -13,6 +13,8 @@ import galleryRoute from './routes/galleryRoute.js';
 import podcastRoute from './routes/podcastRoute.js';
 import donationRoute from "./routes/donationRoute.js"
 import awarenessRoute from './routes/awarenessRoute.js';
+import jobRoutes from './routes/jobRoute.js';
+
 import fs from 'fs';
 
 import path from 'path';
@@ -51,6 +53,7 @@ app.use('/api/gallery', galleryRoute);
 app.use('/api/podcasts', podcastRoute);
 app.use('/api/donations' , donationRoute);
 app.use('/api/awareness', awarenessRoute);
+app.use('/api/jobs', jobRoutes);
 app.get('/api/partner-logos', (req, res) => {
   console.log("req hittt")
   const folderPath = path.join(__dirname, 'uploads', 'company_ngo');
