@@ -12,14 +12,10 @@ import contactUsRoute from './routes/contactUsRoute.js';
 import galleryRoute from './routes/galleryRoute.js';
 import podcastRoute from './routes/podcastRoute.js';
 import donationRoute from "./routes/donationRoute.js"
-<<<<<<< HEAD
 import awarenessRoute from './routes/awarenessRoute.js';
 import fs from 'fs';
-=======
-import awarenessRoute from "./routes/awarenessRoute.js"
 
-import path from 'path';
->>>>>>> af0d7a3a2d05ac0d02faa114d8bdd1aaa8682c27
+
 
 import path from 'path';
 import { fileURLToPath } from 'url';

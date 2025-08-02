@@ -21,6 +21,7 @@ export interface Event {
 }
 
 export interface Program {
+  _id: string;
   title: string;
   description: string;
   startingDate: string;
